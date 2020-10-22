@@ -37,7 +37,8 @@ namespace Rmjcs.Simonish.Services
 
             // This is called via Task.Run.
 
-            Results results = _fileHelper.LoadResults();
+            string text = _fileHelper.ReadResultsFile();
+            Results results = new Results(text);
 
             // These results have *probably* been loaded before any played games,
             // but just in case we merge them in individually.
@@ -106,7 +107,8 @@ namespace Rmjcs.Simonish.Services
             // Note: SaveResults will run on a background thread and enumerate the lists it receives so
             // we can not pass BestResults and LatestResults because they might be modified on the UI thread.
 
-            _fileHelper.SaveResults(results);
+            string text = results.ToString();
+            _fileHelper.WriteResultsFile(text);
         }
 
         /// <summary>

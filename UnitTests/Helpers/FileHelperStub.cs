@@ -7,7 +7,7 @@ namespace UnitTests.Helpers
 {
     internal class FileHelperStub : IFileHelper
     {
-        private readonly Results _results;
+        private readonly string _resultsText;
 
         public FileHelperStub() : this(0)
         {
@@ -36,15 +36,15 @@ namespace UnitTests.Helpers
                     latestResults.Insert(0, result);
             }
 
-            _results = new Results { BestResults = bestResults, LatestResults = latestResults };
+            _resultsText = new Results { BestResults = bestResults, LatestResults = latestResults }.ToString();
         }
 
-        public Results LoadResults()
+        public string ReadResultsFile()
         {
-            return _results;
+            return _resultsText;
         }
 
-        public void SaveResults(Results results)
+        public void WriteResultsFile(string text)
         {
             // This is a stub, no need to do anything here.
         }

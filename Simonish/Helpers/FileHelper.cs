@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using Rmjcs.Simonish.Models;
 
 namespace Rmjcs.Simonish.Helpers
 {
@@ -11,8 +10,6 @@ namespace Rmjcs.Simonish.Helpers
     /// <remarks>A single instance of this class is created by the ViewModelLocator.</remarks>
     internal class FileHelper : IFileHelper
     {
-        // ToDo: Merge this into XamarinWrapper because it is Xamarin specific ?
-
         private readonly string _resultsFileFullName;
 
         private readonly object _resultsFileLocker = new object();
@@ -24,32 +21,30 @@ namespace Rmjcs.Simonish.Helpers
             _resultsFileFullName = Path.Combine(xamarinWrapper.AppDataDirectory, "Simonish.txt");
         }
 
-        public Results LoadResults()
+        public string ReadResultsFile()
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
 
-            Results results = null;
+            string text = null;
 
             lock (_resultsFileLocker)
             {
                 if (File.Exists(_resultsFileFullName))
                 {
-                    string gameResultsText = File.ReadAllText(_resultsFileFullName);
-                    results = new Results(gameResultsText);
+                    text = File.ReadAllText(_resultsFileFullName);
                 }
             }
 
-            return results ?? new Results();
+            return text;
         }
 
-        public void SaveResults(Results results)
+        public void WriteResultsFile(string text)
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
 
             lock (_resultsFileLocker)
             {
-                string gameResultsText = results.ToString();
-                File.WriteAllText(_resultsFileFullName, gameResultsText);
+                File.WriteAllText(_resultsFileFullName, text);
             }
         }
 

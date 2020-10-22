@@ -1,24 +1,23 @@
 ﻿using System;
-using Rmjcs.Simonish.Models;
 
 namespace Rmjcs.Simonish.Helpers
 {
     /// <summary>
-    /// An interface for a class that handles all file IO.
+    /// An interface for a class that handles all app file IO.
     /// </summary>
     internal interface IFileHelper
     {
         /// <summary>
-        /// Load a set of previously saved best and latest game results.
+        /// Read the text in the results file.
         /// </summary>
-        /// <returns>A Results with zero or more BestResults and zero or more LatestResults.</returns>
-        Results LoadResults();
+        /// <returns>The text from the results file.</returns>
+        string ReadResultsFile();
 
         /// <summary>
-        /// Save the supplied best and latest game results.
+        /// Write text to the results file.
         /// </summary>
-        /// <param name="results">The Results to save.</param>
-        void SaveResults(Results results);
+        /// <param name="text">The text to write.</param>
+        void WriteResultsFile(string text);
 
         /// <summary>
         /// Write exception information to a log file.

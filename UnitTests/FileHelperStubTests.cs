@@ -36,7 +36,8 @@ namespace UnitTests
 
             Results results = new Results();
 
-            fileHelperStub.SaveResults(results);
+            string text = results.ToString();
+            fileHelperStub.WriteResultsFile(text);
         }
 
         [Test]
@@ -44,7 +45,8 @@ namespace UnitTests
         {
             FileHelperStub fileHelperStub = new FileHelperStub();
 
-            Results results = fileHelperStub.LoadResults();
+            string text = fileHelperStub.ReadResultsFile();
+            Results results = new Results(text);
 
             int bestLoadedExpectedCount = Math.Clamp(Constants.MaxBestResults + n, 0, Constants.MaxBestResults);
             int latestLoadedExpectedCount = Math.Clamp(Constants.MaxLatestResults + n, 0, Constants.MaxLatestResults);
