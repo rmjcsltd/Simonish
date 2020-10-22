@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Rmjcs.Simonish.Pages.AboutPage"
+             xmlns:helpers="clr-namespace:Rmjcs.Simonish.Helpers;assembly=Rmjcs.Simonish"
+             helpers:ViewModelLocator.AutoWireViewModel="true">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="Black" />
+                <Setter Property="FontSize" Value="Body"/>
+            </Style>
+            <Style x:Key="HeadingLabel" TargetType="Label">
+                <Setter Property="TextColor" Value="#9b4900" />
+                <Setter Property="FontSize" Value="Title"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+
+        <ScrollView Padding="10" AutomationId="AboutScroll">
+
+            <StackLayout Spacing="10">
+
+                <Label Text="Simonish" Style="{StaticResource HeadingLabel}" />
+
+                <Label Text="One of the best ways to learn something is to do it, so this is me doing a little Xamarin development to get a feel for what it can do." />
+
+                <Label Text="If you want to get in touch drop me an email to rhys@rmjcs.com." />
+
+                <Label Text="How to Play" Style="{StaticResource HeadingLabel}" />
+
+                <Label Text="This game looks a bit like the classic electronic game Simon (originally launched by Milton Bradley in 1978) but is a lot easier to play, just requiring quick responses rather than a good memory." />
+
+                <Label>
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Press the Start button to begin the game. After the countdown the coloured buttons will light up randomly, one at a time. Press a lit button to score a point, pressing an unlit button will lose a point. After " />
+                            <Span Text="{Binding GameDurationText}" />
+                            <Span Text=" seconds the game is over." />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+
+                <Label Text="Privacy" Style="{StaticResource HeadingLabel}" />
+
+                <Label>
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="This game is 'just for fun'. It does not collect or store or share any personally identifiable information. There is a " />
+                            <Span Text="privacy policy"
+                              TextColor="Blue"
+                              TextDecorations="Underline">
+                                <Span.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ShowWebPageCommand}" />
+                                </Span.GestureRecognizers>
+                            </Span>
+                            <Span Text=" that expands on this a little." />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+
+                <!-- Separator line -->
+                <BoxView HeightRequest="1" Color="#616161" />
+
+                <Label>
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Version " />
+                            <Span Text="{Binding BuildVersionText}" />
+                            <Span Text=", built " />
+                            <Span Text="{Binding BuildDateText}" />
+                            <Span Text="." />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+
+            </StackLayout>
+
+        </ScrollView>
+
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Rmjcs.Simonish.Pages.GamePage"
+             xmlns:helpers="clr-namespace:Rmjcs.Simonish.Helpers;assembly=Rmjcs.Simonish"
+             helpers:ViewModelLocator.AutoWireViewModel="true">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="Black" />
+                <Setter Property="FontSize" Value="Body"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+
+        <StackLayout Padding="10" Spacing="10" AutomationId="PlayStack">
+
+            <Button Text="Start" Command="{Binding StartCommand}" HorizontalOptions="FillAndExpand" />
+
+            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                <Label Text="Time :" HorizontalOptions="Start" x:Name="TimeLabel" />
+                <ProgressBar HorizontalOptions="FillAndExpand" ProgressColor="#d27619" Progress="{Binding TimeLeft}"/>
+                <Label Text="Score :" HorizontalOptions="End" />
+                <Label Text="{Binding Score}" HorizontalOptions="End" />
+            </StackLayout>
+
+            <Grid VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand"
+              ColumnSpacing="10" RowSpacing="10" ColumnDefinitions="*, *" RowDefinitions="*, *">
+
+                <Button Grid.Row="0" Grid.Column="0" Command="{Binding HitCommand}" AutomationProperties.Name="Green" CornerRadius="10" BackgroundColor="{Binding ButtonColours[0]}">
+                    <Button.CommandParameter>
+                        <x:Int32>0</x:Int32>
+                    </Button.CommandParameter>
+                </Button>
+                <Button Grid.Row="0" Grid.Column="1" Command="{Binding HitCommand}" AutomationProperties.Name="Red" CornerRadius="10" BackgroundColor="{Binding ButtonColours[1]}">
+                    <Button.CommandParameter>
+                        <x:Int32>1</x:Int32>
+                    </Button.CommandParameter>
+                </Button>
+                <Button Grid.Row="1" Grid.Column="0" Command="{Binding HitCommand}" AutomationProperties.Name="Yellow" CornerRadius="10" BackgroundColor="{Binding ButtonColours[2]}">
+                    <Button.CommandParameter>
+                        <x:Int32>2</x:Int32>
+                    </Button.CommandParameter>
+                </Button>
+                <Button Grid.Row="1" Grid.Column="1" Command="{Binding HitCommand}" AutomationProperties.Name="Blue" CornerRadius="10" BackgroundColor="{Binding ButtonColours[3]}">
+                    <Button.CommandParameter>
+                        <x:Int32>3</x:Int32>
+                    </Button.CommandParameter>
+                </Button>
+
+                <Label Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2" Text="{Binding OverlayText}" IsVisible="{Binding OverlayIsVisible}"
+                HorizontalTextAlignment="Center" VerticalTextAlignment="Center" BackgroundColor="#7FFFFFFF" x:Name="OverlayLabel" AutomationId="OverlayLabel" />
+
+            </Grid>
+
+        </StackLayout>
+
+    </ContentPage.Content>
+</ContentPage>

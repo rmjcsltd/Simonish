@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:Rmjcs.Simonish.Models;assembly=Rmjcs.Simonish"
+             x:Class="Rmjcs.Simonish.Pages.ResultsPage"
+             xmlns:helpers="clr-namespace:Rmjcs.Simonish.Helpers;assembly=Rmjcs.Simonish"
+             helpers:ViewModelLocator.AutoWireViewModel="true">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="Black" />
+                <Setter Property="FontSize" Value="Body"/>
+            </Style>
+            <Style x:Key="HeadingLabel" TargetType="Label">
+                <Setter Property="TextColor" Value="#9b4900" />
+                <Setter Property="FontSize" Value="Title"/>
+            </Style>
+            <DataTemplate x:Key="ResultTemplate" x:DataType="models:Result">
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="{Binding StartTimeLocalText}" HorizontalOptions="CenterAndExpand" />
+                    <Label Text="{Binding ScoreText}" HorizontalOptions="CenterAndExpand" />
+                </StackLayout>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+
+        <ScrollView Padding="10" AutomationId="ScoresScroll">
+
+            <!-- A Hall of Fame would require a cloud database which I'm not going to implement (for now). -->
+
+            <StackLayout Spacing="20">
+
+                <Label Text="Best" Style="{StaticResource HeadingLabel}" HorizontalTextAlignment="Center" />
+
+                <StackLayout Spacing="10" BindableLayout.ItemsSource="{Binding BestResults}" BindableLayout.ItemTemplate="{StaticResource ResultTemplate}">
+                    <BindableLayout.EmptyView>
+                        <Label Text="No best scores yet..." FontAttributes="Italic" HorizontalTextAlignment="Center" />
+                    </BindableLayout.EmptyView>
+                </StackLayout>
+
+                <Label Text="Latest" Style="{StaticResource HeadingLabel}" HorizontalTextAlignment="Center" />
+
+                <StackLayout Spacing="10" BindableLayout.ItemsSource="{Binding LatestResults}" BindableLayout.ItemTemplate="{StaticResource ResultTemplate}">
+                    <BindableLayout.EmptyView>
+                        <Label Text="No latest scores yet..." FontAttributes="Italic" HorizontalTextAlignment="Center" />
+                    </BindableLayout.EmptyView>
+                </StackLayout>
+
+            </StackLayout>
+
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>
