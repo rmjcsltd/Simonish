@@ -16,7 +16,7 @@
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>C:\Users\Rhys\source\repos\Simonish\Simonish\Rmjcs.Simonish.xml</DocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Rmjcs.Simonish.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UITest|AnyCPU'">
