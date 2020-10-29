@@ -43,7 +43,6 @@ namespace Rmjcs.Simonish.ViewModels
             get => _results.BestResults;
             set
             {
-
                 if (!ReferenceEquals(value, _results.BestResults))
                 {
                     _results.BestResults = value;
