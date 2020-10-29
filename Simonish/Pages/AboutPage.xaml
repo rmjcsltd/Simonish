@@ -26,7 +26,23 @@
 
                 <Label Text="Simonish" Style="{StaticResource HeadingLabel}" />
 
-                <Label Text="One of the best ways to learn something is to do it, so this is me doing a little Xamarin development to get a feel for what it can do." />
+                <Label>
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="One of the best ways to learn something is to do it, so this is me doing a little Xamarin development to get a feel for what it can do. The source code is on " />
+                            <Span Text="GitHub"
+                              TextColor="Blue"
+                              TextDecorations="Underline">
+                                <Span.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ShowWebPageCommand}">
+                                        <TapGestureRecognizer.CommandParameter><x:Int32>1</x:Int32></TapGestureRecognizer.CommandParameter>
+                                    </TapGestureRecognizer>
+                                </Span.GestureRecognizers>
+                            </Span>
+                            <Span Text=" if you want to take a look." />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
 
                 <Label Text="If you want to get in touch drop me an email to rhys@rmjcs.com." />
 
@@ -54,7 +70,9 @@
                               TextColor="Blue"
                               TextDecorations="Underline">
                                 <Span.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding ShowWebPageCommand}" />
+                                    <TapGestureRecognizer Command="{Binding ShowWebPageCommand}">
+                                        <TapGestureRecognizer.CommandParameter><x:Int32>2</x:Int32></TapGestureRecognizer.CommandParameter>
+                                    </TapGestureRecognizer>
                                 </Span.GestureRecognizers>
                             </Span>
                             <Span Text=" that expands on this a little." />

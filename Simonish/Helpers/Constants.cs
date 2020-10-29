@@ -46,5 +46,9 @@
         /// </summary>
         internal const string PrivacyPolicyUrl = "https://www.rmjcs.com/simonish/privacy";
 
+        /// <summary>
+        /// The URL for the app's GitHub repo.
+        /// </summary>
+        internal const string GitHubUrl = "https://github.com/rmjcsltd/Simonish";
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Windows.Input;
 using Rmjcs.Simonish.Helpers;
 using Xamarin.Forms;
@@ -19,11 +20,21 @@ namespace Rmjcs.Simonish.ViewModels
             _xamarinWrapper = xamarinWrapper;
         }
 
-        public ICommand ShowWebPageCommand => new Command(ShowWebPage);
+        public ICommand ShowWebPageCommand => new Command<int>(ShowWebPage);
 
-        private void ShowWebPage()
+        private void ShowWebPage(int i)
         {
-            _xamarinWrapper.ShowWebPage(Constants.PrivacyPolicyUrl);
+            switch (i)
+            {
+                case 1:
+                    _xamarinWrapper.ShowWebPage(Constants.GitHubUrl);
+                    break;
+                case 2:
+                    _xamarinWrapper.ShowWebPage(Constants.PrivacyPolicyUrl);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(i));
+            }
         }
 
         // Although these are effectively static properties if they are defined as static then binding will not work.
