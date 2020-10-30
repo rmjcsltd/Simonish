@@ -13,6 +13,9 @@ namespace Rmjcs.Simonish.Models
     /// They _could_ be cast back to Lists then modified but this would not be good practice.</remarks>
     internal class Results
     {
+        private IEnumerable<Result> _bestResults;
+        private IEnumerable<Result> _latestResults;
+
         /// <summary>
         /// Initialises a new instance of the <see cref="Results"/> class with 2 empty collections.
         /// </summary>
@@ -90,12 +93,20 @@ namespace Rmjcs.Simonish.Models
         /// <summary>
         /// Gets the collection of best collections of <see cref="Result"/>s.
         /// </summary>
-        public IEnumerable<Result> BestResults { get; set; }
+        public IEnumerable<Result> BestResults
+        {
+            get => _bestResults ?? throw new ArgumentNullException(nameof(_bestResults));
+            set => _bestResults = value ?? throw new ArgumentNullException(nameof(value));
+        }
 
         /// <summary>
         /// Gets the collection of latest collections of <see cref="Result"/>s.
         /// </summary>
-        public IEnumerable<Result> LatestResults { get; set; }
+        public IEnumerable<Result> LatestResults
+        {
+            get => _latestResults ?? throw new ArgumentNullException(nameof(_latestResults));
+            set => _latestResults = value ?? throw new ArgumentNullException(nameof(value));
+        }
 
         /// <summary>
         /// Converts the value of the current <see cref="Results"/> object to its equivalent string representation.
