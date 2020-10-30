@@ -26,7 +26,14 @@ namespace Rmjcs.Simonish.Services
             _results = new Results();
         }
 
-        #region Public 
+        #region Public
+
+        public void InitialiseListeners()
+        {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+
+            OnResultsChanged(true, true);
+        }
 
         /// <summary>
         /// Load Results from file into the BestResults and LatestResults lists.

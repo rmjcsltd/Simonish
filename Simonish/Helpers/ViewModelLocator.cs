@@ -80,6 +80,11 @@ namespace Rmjcs.Simonish.Helpers
             }
 
             bindable.BindingContext = viewModel;
+
+            if (bindable.GetType() == typeof(ResultsPage))
+            {
+                ResultsService.InitialiseListeners();
+            }
         }
 
         /// <summary>
