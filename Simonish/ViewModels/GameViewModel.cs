@@ -47,7 +47,7 @@ namespace Rmjcs.Simonish.ViewModels
 
         public GameViewModel(IXamarinWrapper xamarinWrapper, GameService gameService)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             StartCommand = new Command(Start, CanExecuteStart);
             HitCommand = new Command<int>(Hit, CanExecuteHit);
@@ -81,7 +81,7 @@ namespace Rmjcs.Simonish.ViewModels
 
         private void Start()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             // Previous phase was GamePhase.Launched or GamePhase.GameOver.
             _canStart = false;
@@ -96,7 +96,7 @@ namespace Rmjcs.Simonish.ViewModels
 
         private bool CanExecuteStart()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             return _canStart;
         }
@@ -105,7 +105,7 @@ namespace Rmjcs.Simonish.ViewModels
 
         private void Hit(int index)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             (bool Success, int Score, int NewTargetIndex) result = _gameService.Hit(index);
 
@@ -118,7 +118,7 @@ namespace Rmjcs.Simonish.ViewModels
 
         private bool CanExecuteHit(int _)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             return _canHit;
         }
@@ -189,7 +189,7 @@ namespace Rmjcs.Simonish.ViewModels
 
         private void OnPhaseChangeRequired(object sender, PhaseChangeRequiredEventArgs args)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             // Note: This ViewModel assumes events are raised on the UI thread.
             Debug.Assert(_xamarinWrapper.IsMainThread);
@@ -224,7 +224,7 @@ namespace Rmjcs.Simonish.ViewModels
 
         private void OnCountdownTimer(object sender, CountdownEventArgs e)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             // Note: This ViewModel assumes events are raised on the UI thread.
             Debug.Assert(_xamarinWrapper.IsMainThread);
@@ -234,7 +234,7 @@ namespace Rmjcs.Simonish.ViewModels
 
         private void OnPlayTimer(object sender, PlayEventArgs e)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             // Note: This ViewModel assumes events are raised on the UI thread.
             Debug.Assert(_xamarinWrapper.IsMainThread);
@@ -267,6 +267,8 @@ namespace Rmjcs.Simonish.ViewModels
         /// </summary>
         public void Dispose()
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             _gameService?.Dispose();
         }
 

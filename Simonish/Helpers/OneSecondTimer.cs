@@ -14,6 +14,8 @@ namespace Rmjcs.Simonish.Helpers
 
         public OneSecondTimer()
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             _timer = new Timer { Enabled = false, AutoReset = false, Interval = 1000 };
             _timer.Elapsed += TimerOnElapsed;
         }
@@ -22,6 +24,8 @@ namespace Rmjcs.Simonish.Helpers
         /// <exception cref="InvalidOperationException">Action has already been set.</exception>
         public void SetAction(Action action)
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
@@ -41,6 +45,8 @@ namespace Rmjcs.Simonish.Helpers
         {
             // This method will be called on a ThreadPool thread.
 
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             if (_action == null)
             {
                 throw new InvalidOperationException("The action must be set before the timer fires.");
@@ -52,6 +58,8 @@ namespace Rmjcs.Simonish.Helpers
         /// <exception cref="InvalidOperationException">The action must be set before the timer is started.</exception>
         public void Start()
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             if (_action == null)
             {
                 throw new InvalidOperationException("The action must be set before the timer is started.");
@@ -67,6 +75,8 @@ namespace Rmjcs.Simonish.Helpers
         /// </summary>
         public void Dispose()
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             _timer?.Dispose();
         }
 

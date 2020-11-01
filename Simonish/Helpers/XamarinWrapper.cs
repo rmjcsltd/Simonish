@@ -15,7 +15,7 @@ namespace Rmjcs.Simonish.Helpers
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1810:Initialize reference type static fields inline", Justification = "I want to use WriteDebugEntryMessage to track when this is called.")]
         static XamarinWrapper()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), null);
 
             MainThreadSynchronizationContext = MainThread.GetMainThreadSynchronizationContextAsync().Result;
         }
@@ -28,6 +28,8 @@ namespace Rmjcs.Simonish.Helpers
 
         public void ShowWebPage(string url)
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             if (url == null)
             {
                 throw new ArgumentNullException(nameof(url));

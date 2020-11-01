@@ -18,7 +18,7 @@ namespace Rmjcs.Simonish.Services
 
         public ResultsService(IXamarinWrapper xamarinWrapper, IFileHelper fileHelper)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             _synchronisationContext = xamarinWrapper.MainSynchronizationContext;
             _fileHelper = fileHelper;
@@ -30,7 +30,7 @@ namespace Rmjcs.Simonish.Services
 
         public void InitialiseListeners()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             OnResultsChanged(true, true);
         }
@@ -40,7 +40,7 @@ namespace Rmjcs.Simonish.Services
         /// </summary>
         public void LoadResults()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             // This is called via Task.Run.
 
@@ -79,7 +79,7 @@ namespace Rmjcs.Simonish.Services
         {
             // This is called via Task.Run.
 
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             if (result == null)
             {
@@ -107,8 +107,6 @@ namespace Rmjcs.Simonish.Services
         /// <returns>A task representing the asynchronous operation.</returns>
         private void SaveResults()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
-
             Results results = new Results(_results);
 
             // Note: SaveResults will run on a background thread and enumerate the lists it receives so
@@ -190,8 +188,6 @@ namespace Rmjcs.Simonish.Services
 
         private void OnResultsChanged(bool bestChanged, bool latestChanged)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
-
             // Don't raise an event if nothing has changed.
             if (!(bestChanged || latestChanged)) return;
 

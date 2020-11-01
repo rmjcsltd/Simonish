@@ -21,7 +21,7 @@ namespace Rmjcs.Simonish.ViewModels
 
         public ResultsViewModel(IXamarinWrapper xamarinWrapper, ResultsService resultsService)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             _xamarinWrapper = xamarinWrapper;
             resultsService.ResultsChanged += OnResultsChanged;
@@ -70,7 +70,7 @@ namespace Rmjcs.Simonish.ViewModels
 
         private void OnResultsChanged(object sender, ResultsChangedEventArgs e)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             // Note: This ViewModel assumes events are raised on the UI thread.
             Debug.Assert(_xamarinWrapper.IsMainThread);

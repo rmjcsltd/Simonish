@@ -16,14 +16,14 @@ namespace Rmjcs.Simonish.Helpers
 
         public FileHelper(IXamarinWrapper xamarinWrapper)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             _resultsFileFullName = Path.Combine(xamarinWrapper.AppDataDirectory, "Simonish.txt");
         }
 
         public string ReadResultsFile()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             string text = null;
 
@@ -40,7 +40,7 @@ namespace Rmjcs.Simonish.Helpers
 
         public void WriteResultsFile(string text)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             lock (_resultsFileLocker)
             {
@@ -50,6 +50,8 @@ namespace Rmjcs.Simonish.Helpers
 
         public void LogException(Exception e)
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             // Until there is a way to use a log file there is no point creating one.
             Debug.WriteLine(e);
         }

@@ -22,7 +22,7 @@ namespace Rmjcs.Simonish.Services
 
         public GameService(IXamarinWrapper xamarinWrapper, IFileHelper fileHelper, ITimer timer, ResultsService resultsService)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             _xamarinWrapper = xamarinWrapper;
             _fileHelper = fileHelper;
@@ -38,7 +38,7 @@ namespace Rmjcs.Simonish.Services
 
         public void StartCountdown()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             // This method is expected to be called on the main thread.
             Debug.Assert(_xamarinWrapper.IsMainThread);
@@ -50,7 +50,7 @@ namespace Rmjcs.Simonish.Services
 
         public int StartPlaying()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             // This method is expected to be called on the main thread.
             Debug.Assert(_xamarinWrapper.IsMainThread);
@@ -61,7 +61,7 @@ namespace Rmjcs.Simonish.Services
 
         public (bool Success, int Score, int NewTargetIndex) Hit(int targetIndex)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             // This method is expected to be called on the main thread.
             Debug.Assert(_xamarinWrapper.IsMainThread);
@@ -71,7 +71,7 @@ namespace Rmjcs.Simonish.Services
 
         public void EndPlay()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             // This method is expected to be called on the main thread.
             Debug.Assert(_xamarinWrapper.IsMainThread);
@@ -105,7 +105,7 @@ namespace Rmjcs.Simonish.Services
 
         private void OnTimer()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             // Note: This method might be called on a thread pool thread.
 
@@ -152,8 +152,6 @@ namespace Rmjcs.Simonish.Services
 
             void OnPhaseChangeRequired(GamePhase newGamePhase)
             {
-                Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
-
                 PhaseChangeRequiredEventArgs args = new PhaseChangeRequiredEventArgs { NewGamePhase = newGamePhase };
                 EventHandler<PhaseChangeRequiredEventArgs> handler = PhaseChangeRequired;
                 if (handler != null)
@@ -167,8 +165,6 @@ namespace Rmjcs.Simonish.Services
 
             void OnCountdownTimer(int countdown)
             {
-                Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
-
                 CountdownEventArgs args = new CountdownEventArgs { Countdown = countdown };
                 EventHandler<CountdownEventArgs> handler = CountdownTimer;
                 if (handler != null)
@@ -181,8 +177,6 @@ namespace Rmjcs.Simonish.Services
 
             void OnPlayTimer(double proportionLeft)
             {
-                Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
-
                 PlayEventArgs args = new PlayEventArgs { TimeLeft = proportionLeft };
                 EventHandler<PlayEventArgs> handler = PlayTimer;
                 if (handler != null)
@@ -204,6 +198,8 @@ namespace Rmjcs.Simonish.Services
         /// </summary>
         public void Dispose()
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             _timer?.Dispose();
             _game?.Dispose();
         }

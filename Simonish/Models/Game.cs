@@ -30,6 +30,8 @@ namespace Rmjcs.Simonish.Models
         /// </summary>
         public Game()
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             _readerWriterLocker = new ReaderWriterLockSlim();
             _randomNumberGenerator = new Random();
 
@@ -44,6 +46,8 @@ namespace Rmjcs.Simonish.Models
         /// <returns>The new game phase.</returns>
         public void StartCountdown()
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             _readerWriterLocker.EnterWriteLock();
 
             try
@@ -71,6 +75,8 @@ namespace Rmjcs.Simonish.Models
         /// <returns>The remaining countdown steps.</returns>
         public int DecrementCountdown()
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             _readerWriterLocker.EnterWriteLock();
 
             try
@@ -102,6 +108,8 @@ namespace Rmjcs.Simonish.Models
         /// NewTargetIndex is the new target index.</returns>
         public int StartPlay()
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             _readerWriterLocker.EnterWriteLock();
 
             try
@@ -140,6 +148,8 @@ namespace Rmjcs.Simonish.Models
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="targetIndex"/> is out of range.</exception>
         public (bool Success, int Score, int NewTargetIndex) RecordHit(int targetIndex)
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             _readerWriterLocker.EnterWriteLock();
 
             try
@@ -194,6 +204,8 @@ namespace Rmjcs.Simonish.Models
         /// <returns>This method returns the new game phase.</returns>
         public void EndPlay()
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             _readerWriterLocker.EnterWriteLock();
 
             try
@@ -218,6 +230,8 @@ namespace Rmjcs.Simonish.Models
         /// <returns>A new <see cref="Result"/>.</returns>
         public Result GetResult()
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             _readerWriterLocker.EnterReadLock();
 
             try
@@ -307,6 +321,8 @@ namespace Rmjcs.Simonish.Models
         /// </summary>
         public void Dispose()
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             _readerWriterLocker?.Dispose();
         }
 

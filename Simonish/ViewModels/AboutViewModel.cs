@@ -15,7 +15,7 @@ namespace Rmjcs.Simonish.ViewModels
 
         public AboutViewModel(IXamarinWrapper xamarinWrapper)
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             _xamarinWrapper = xamarinWrapper;
         }
@@ -24,6 +24,8 @@ namespace Rmjcs.Simonish.ViewModels
 
         private void ShowWebPage(int i)
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             switch (i)
             {
                 case 1:

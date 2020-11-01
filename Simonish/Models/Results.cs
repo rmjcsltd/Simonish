@@ -21,6 +21,8 @@ namespace Rmjcs.Simonish.Models
         /// </summary>
         public Results()
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             // Because the lists are immutable they might as well be initialised with zero capacity.
             BestResults = new List<Result>(0);
             LatestResults = new List<Result>(0);
@@ -33,6 +35,8 @@ namespace Rmjcs.Simonish.Models
         /// <exception cref="ArgumentNullException"><paramref name="results"/> is <see langword="null"/></exception>
         public Results(Results results)
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             if (results == null)
             {
                 throw new ArgumentNullException(nameof(results));
@@ -50,6 +54,8 @@ namespace Rmjcs.Simonish.Models
         /// <exception cref="FormatException">The string representation of a <see cref="Results"/> is not valid.</exception>
         public Results(string gameResultsText)
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             if (gameResultsText == null)
             {
                 throw new ArgumentNullException(nameof(gameResultsText));

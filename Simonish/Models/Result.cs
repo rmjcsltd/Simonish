@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Rmjcs.Simonish.Helpers;
 
 namespace Rmjcs.Simonish.Models
 {
@@ -16,6 +17,8 @@ namespace Rmjcs.Simonish.Models
         /// <param name="incorrectHits"></param>
         public Result(DateTime startTimeUtc, int correctHits, int incorrectHits)
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             StartTimeUtc = startTimeUtc;
             CorrectHits = correctHits;
             IncorrectHits = incorrectHits;
@@ -29,6 +32,8 @@ namespace Rmjcs.Simonish.Models
         /// <exception cref="FormatException">The string representation of a <see cref="Result"/> is not valid.</exception>
         public Result(string gameResultText)
         {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
             if (gameResultText == null)
             {
                 throw new ArgumentNullException(nameof(gameResultText));

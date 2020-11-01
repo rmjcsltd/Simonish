@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using Rmjcs.Simonish.Pages;
 using Rmjcs.Simonish.Services;
 using Rmjcs.Simonish.ViewModels;
@@ -29,7 +28,7 @@ namespace Rmjcs.Simonish.Helpers
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1810:Initialize reference type static fields inline", Justification = "I want to use WriteDebugEntryMessage to track when this is called.")]
         static ViewModelLocator()
         {
-            Utility.WriteDebugEntryMessage(MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), null);
 
             XamarinWrapper = new XamarinWrapper();
             FileHelper = new FileHelper(XamarinWrapper);
@@ -56,7 +55,7 @@ namespace Rmjcs.Simonish.Helpers
         /// <param name="newValue">The new property value (not used here).</param>
         private static void OnAutoWireViewModelChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            Utility.WriteDebugEntryMessage(MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), null);
 
             object viewModel;
 
@@ -93,7 +92,7 @@ namespace Rmjcs.Simonish.Helpers
         /// <returns></returns>
         public static ResultsService ResolveScoresService()
         {
-            Utility.WriteDebugEntryMessage(MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), null);
 
             return ResultsService;
         }
@@ -104,7 +103,7 @@ namespace Rmjcs.Simonish.Helpers
         /// <returns></returns>
         public static IFileHelper ResolveIFileHelper()
         {
-            Utility.WriteDebugEntryMessage(MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), null);
 
             return FileHelper;
         }

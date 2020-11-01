@@ -15,7 +15,7 @@ namespace Rmjcs.Simonish.Pages
         /// </summary>
         public ResultsPage()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
             
             InitializeComponent();
         }

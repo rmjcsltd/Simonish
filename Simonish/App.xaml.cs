@@ -19,7 +19,7 @@ namespace Rmjcs.Simonish
         /// </summary>
         public App()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             InitializeComponent();
 
@@ -31,7 +31,7 @@ namespace Rmjcs.Simonish
         /// </summary>
         protected override void OnStart()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod());
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             if (!_resultsLoadedCalled)
             {
