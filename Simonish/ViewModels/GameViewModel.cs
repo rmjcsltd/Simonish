@@ -68,9 +68,9 @@ namespace Rmjcs.Simonish.ViewModels
 
             _xamarinWrapper = xamarinWrapper;
             _gameService = gameService;
-            _gameService.PhaseChangeRequired += OnPhaseChangeRequired;
-            _gameService.CountdownTimer += OnCountdownTimer;
-            _gameService.PlayTimer += OnPlayTimer;
+            _gameService.PhaseChangeRequired += GameServicePhaseChangeRequired;
+            _gameService.CountdownTimer += GameServiceCountdownTimer;
+            _gameService.PlayTimer += GameServicePlayTimer;
         }
 
         #endregion
@@ -189,7 +189,7 @@ namespace Rmjcs.Simonish.ViewModels
 
         #region Event Handlers
 
-        private void OnPhaseChangeRequired(object sender, PhaseChangeRequiredEventArgs args)
+        private void GameServicePhaseChangeRequired(object sender, PhaseChangeRequiredEventArgs args)
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
@@ -224,7 +224,7 @@ namespace Rmjcs.Simonish.ViewModels
             }
         }
 
-        private void OnCountdownTimer(object sender, CountdownEventArgs e)
+        private void GameServiceCountdownTimer(object sender, CountdownEventArgs e)
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
@@ -234,7 +234,7 @@ namespace Rmjcs.Simonish.ViewModels
             OverlayText = e.Countdown.ToString("0", CultureInfo.CurrentCulture);
         }
 
-        private void OnPlayTimer(object sender, PlayEventArgs e)
+        private void GameServicePlayTimer(object sender, PlayEventArgs e)
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 

@@ -22,7 +22,7 @@ namespace UnitTests
             SynchronizationContext.SetSynchronizationContext(new TestSynchronizationContext());
         }
 
-        private static ResultsService CreateScoresService(int countError)
+        private static ResultsService CreateResultsService(int countError)
         {
             IXamarinWrapper xamarinWrapper = new XamarinWrapperStub();
             IFileHelper fileHelper = new FileHelperStub(countError);
@@ -42,34 +42,34 @@ namespace UnitTests
             // 1 item is always sorted.
             Assert.IsTrue(IsListSorted(gameResults));
 
-            // Add the same score.
+            // Add the same result.
             gameResults.Add(new Result(now, 10, 0));
             Assert.IsTrue(IsListSorted(gameResults));
 
-            // Add a lower score.
+            // Add a lower result.
             gameResults.Add(new Result(now, 8, 0));
             Assert.IsTrue(IsListSorted(gameResults));
 
-            // Insert a higher score.
+            // Insert a higher result.
             gameResults.Insert(0, new Result(now, 12, 0));
             Assert.IsTrue(IsListSorted(gameResults));
 
-            // Insert an earlier matching high score.
+            // Insert an earlier matching high result.
             gameResults.Insert(0, new Result(now.AddMinutes(-1), 12, 0));
             Assert.IsTrue(IsListSorted(gameResults));
 
-            // Add a later matching low score.
+            // Add a later matching low result.
             gameResults.Add(new Result(now.AddMinutes(+1), 8, 0));
             Assert.IsTrue(IsListSorted(gameResults));
 
             // Failures
 
-            // Insert a later matching high score.
+            // Insert a later matching high result.
             gameResults.Insert(0, new Result(now.AddMinutes(+1), 12, 0));
             Assert.IsFalse(IsListSorted(gameResults));
             gameResults.RemoveAt(0);
 
-            // Add an earlier matching low score.
+            // Add an earlier matching low result.
             gameResults.Add(new Result(now.AddMinutes(-1), 8, 0));
             Assert.IsFalse(IsListSorted(gameResults));
             gameResults.RemoveAt(gameResults.Count - 1);
@@ -78,14 +78,14 @@ namespace UnitTests
         [Test]
         public void Construction_Test()
         {
-            _ = CreateScoresService(0);
+            _ = CreateResultsService(0);
         }
 
         [Test]
         public void EventCount_Test()
         {
             int eventCount = 0;
-            ResultsService resultsService = CreateScoresService(0);
+            ResultsService resultsService = CreateResultsService(0);
             resultsService.ResultsChanged += (sender, args) => eventCount++;
 
             Result result = new Result(default, 1, 0);
@@ -102,7 +102,7 @@ namespace UnitTests
         [Test]
         public void MergeNewGameResultNull_Test()
         {
-            ResultsService resultsService = CreateScoresService(0);
+            ResultsService resultsService = CreateResultsService(0);
             Assert.Throws<ArgumentNullException>(() => resultsService.MergeNewGameResult(null));
         }
 
@@ -112,7 +112,7 @@ namespace UnitTests
             // This tests Score sorting.
 
             Results lastEventResults = null;
-            ResultsService resultsService = CreateScoresService(n);
+            ResultsService resultsService = CreateResultsService(n);
             resultsService.ResultsChanged += (sender, args) => lastEventResults = args.Results;
 
             Result result = null;
@@ -139,7 +139,7 @@ namespace UnitTests
             // This tests Score sorting.
 
             Results lastEventResults = null;
-            ResultsService resultsService = CreateScoresService(n);
+            ResultsService resultsService = CreateResultsService(n);
             resultsService.ResultsChanged += (sender, args) => lastEventResults = args.Results;
 
             Result result = null;
@@ -166,7 +166,7 @@ namespace UnitTests
             // This tests StartTimeUtc sorting.
 
             Results lastEventResults = null;
-            ResultsService resultsService = CreateScoresService(n);
+            ResultsService resultsService = CreateResultsService(n);
             resultsService.ResultsChanged += (sender, args) => lastEventResults = args.Results;
 
             Result result = null;
@@ -193,7 +193,7 @@ namespace UnitTests
             // This tests StartTimeUtc sorting.
 
             Results lastEventResults = null;
-            ResultsService resultsService = CreateScoresService(n);
+            ResultsService resultsService = CreateResultsService(n);
             resultsService.ResultsChanged += (sender, args) => lastEventResults = args.Results;
 
             Result result = null;
@@ -218,7 +218,7 @@ namespace UnitTests
         public void LoadResultsIntoEmpty_Test([Range(-MaxResults, MaxResults + 2)] int n)
         {
             Results lastEventResults = null;
-            ResultsService resultsService = CreateScoresService(n);
+            ResultsService resultsService = CreateResultsService(n);
             resultsService.ResultsChanged += (sender, args) => lastEventResults = args.Results;
 
             resultsService.LoadResults();
@@ -253,7 +253,7 @@ namespace UnitTests
         public void LoadResultsIntoHighScore_Test([Range(-MaxResults, MaxResults + 2)] int n)
         {
             Results lastEventResults = null;
-            ResultsService resultsService = CreateScoresService(n);
+            ResultsService resultsService = CreateResultsService(n);
             resultsService.ResultsChanged += (sender, args) => lastEventResults = args.Results;
 
             Result highResult = new Result(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc), int.MaxValue, 0);
@@ -279,7 +279,7 @@ namespace UnitTests
         public void LoadResultsIntoLowScore_Test([Range(-MaxResults, MaxResults + 2)] int n)
         {
             Results lastEventResults = null;
-            ResultsService resultsService = CreateScoresService(n);
+            ResultsService resultsService = CreateResultsService(n);
             resultsService.ResultsChanged += (sender, args) => lastEventResults = args.Results;
 
             Result lowResult = new Result(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc), int.MinValue, 0);
@@ -305,7 +305,7 @@ namespace UnitTests
         public void LoadResultsIntoEarlierSameScore_Test([Range(-Constants.MaxBestResults + 1, Constants.MaxBestResults + 2)] int n)
         {
             Results lastEventResults = null;
-            ResultsService resultsService = CreateScoresService(n);
+            ResultsService resultsService = CreateResultsService(n);
             resultsService.ResultsChanged += (sender, args) => lastEventResults = args.Results;
 
             // Do the load in order to find the best score + date.
@@ -314,7 +314,7 @@ namespace UnitTests
 
             // Reset resultsService to new.
             lastEventResults = null;
-            resultsService = CreateScoresService(n);
+            resultsService = CreateResultsService(n);
             resultsService.ResultsChanged += (sender, args) => lastEventResults = args.Results;
 
             resultsService.MergeNewGameResult(result);
@@ -338,7 +338,7 @@ namespace UnitTests
         public void LoadResultsIntoLaterSameScore_Test([Range(-Constants.MaxBestResults + 1, Constants.MaxBestResults + 2)] int n)
         {
             Results lastEventResults = null;
-            ResultsService resultsService = CreateScoresService(n);
+            ResultsService resultsService = CreateResultsService(n);
             resultsService.ResultsChanged += (sender, args) => lastEventResults = args.Results;
 
             // Do the load in order to find the best score + date.
@@ -347,7 +347,7 @@ namespace UnitTests
 
             // Reset resultsService to new.
             lastEventResults = null;
-            resultsService = CreateScoresService(n);
+            resultsService = CreateResultsService(n);
             resultsService.ResultsChanged += (sender, args) => lastEventResults = args.Results;
 
             resultsService.MergeNewGameResult(result);
@@ -371,7 +371,7 @@ namespace UnitTests
         public void LoadResultsIntoSameSameScore_Test([Range(-Constants.MaxBestResults + 1, Constants.MaxBestResults + 2)] int n)
         {
             Results lastEventResults = null;
-            ResultsService resultsService = CreateScoresService(n);
+            ResultsService resultsService = CreateResultsService(n);
             resultsService.ResultsChanged += (sender, args) => lastEventResults = args.Results;
 
             // Do the load in order to find the best score + date.
@@ -380,7 +380,7 @@ namespace UnitTests
 
             // Reset resultsService to new.
             lastEventResults = null;
-            resultsService = CreateScoresService(n);
+            resultsService = CreateResultsService(n);
             resultsService.ResultsChanged += (sender, args) => lastEventResults = args.Results;
 
             resultsService.MergeNewGameResult(result);

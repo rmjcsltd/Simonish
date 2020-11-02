@@ -29,7 +29,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void GameScore_Test()
+        public void Score_Test()
         {
             Result result = new Result(default, 0, 0);
             Assert.AreEqual(0, result.Score);
@@ -73,7 +73,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void GameScoreText_Test()
+        public void ScoreText_Test()
         {
             Result result = new Result(default, 0, 0);
 

@@ -26,7 +26,7 @@ namespace Rmjcs.Simonish.ViewModels
 
             _xamarinWrapper = xamarinWrapper;
             _resultsService = resultsService;
-            resultsService.ResultsChanged += OnResultsChanged;
+            resultsService.ResultsChanged += ResultsServiceResultsChanged;
 
             // Define the initial state for bound views.
             // No need to set via the properties because this view model has not been bound to the page yet.
@@ -72,7 +72,7 @@ namespace Rmjcs.Simonish.ViewModels
 
         #region Event Handlers
 
-        private void OnResultsChanged(object sender, ResultsChangedEventArgs e)
+        private void ResultsServiceResultsChanged(object sender, ResultsChangedEventArgs e)
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 

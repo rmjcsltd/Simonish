@@ -17,7 +17,7 @@ namespace Rmjcs.Simonish.Helpers
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             _timer = new Timer { Enabled = false, AutoReset = false, Interval = 1000 };
-            _timer.Elapsed += TimerOnElapsed;
+            _timer.Elapsed += TimerElapsed;
         }
 
         /// <exception cref="ArgumentNullException"><paramref name="action"/> is <see langword="null"/></exception>
@@ -41,7 +41,7 @@ namespace Rmjcs.Simonish.Helpers
         }
 
         /// <exception cref="InvalidOperationException">The action must be set before the timer fires.</exception>
-        private void TimerOnElapsed(object sender, ElapsedEventArgs e)
+        private void TimerElapsed(object sender, ElapsedEventArgs e)
         {
             // This method will be called on a ThreadPool thread.
 
