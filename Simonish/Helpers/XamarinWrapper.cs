@@ -11,14 +11,11 @@ namespace Rmjcs.Simonish.Helpers
     /// <remarks>A single instance of this class is created by the ViewModelLocator.</remarks>
     internal class XamarinWrapper : IXamarinWrapper
     {
-        private static readonly SynchronizationContext MainThreadSynchronizationContext;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1810:Initialize reference type static fields inline", Justification = "I want to use WriteDebugEntryMessage to track when this is called.")]
-        static XamarinWrapper()
+        public XamarinWrapper()
         {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), null);
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            MainThreadSynchronizationContext = MainThread.GetMainThreadSynchronizationContextAsync().Result;
+            MainSynchronizationContext = MainThread.GetMainThreadSynchronizationContextAsync().Result;
         }
 
         public void DebugAssertMainSynchronizationContextIsCorrect()
@@ -28,7 +25,7 @@ namespace Rmjcs.Simonish.Helpers
 
         public bool IsMainThread => MainThread.IsMainThread;
 
-        public SynchronizationContext MainSynchronizationContext => MainThreadSynchronizationContext;
+        public SynchronizationContext MainSynchronizationContext { get; }
 
         public string AppDataDirectory => FileSystem.AppDataDirectory;
 

@@ -9,11 +9,11 @@ using Xamarin.Forms;
 namespace Rmjcs.Simonish.Helpers
 {
     /// <summary>
-    /// A class used to assign ViewModels to pages and manage application singletons.
+    /// A static class used to assign ViewModels to pages and manage application singletons.
     /// </summary>
     /// <remarks>Originally based on <see href="https://github.com/dotnet-architecture/eShopOnContainers/blob/dev/src/Mobile/eShopOnContainers/eShopOnContainers.Core/ViewModels/Base/ViewModelLocator.cs"/>.
     /// This class originally used TinyIoC as the inversion of control container but this app doesn't warrant one - dependency injection is easily achieved without a 3rd party helper.</remarks>
-    internal class ViewModelLocator
+    internal static class ViewModelLocator
     {
         // These are the objects that there must only be one of in the app.
         // The classes do not use the singleton pattern because it's not very unit testable.

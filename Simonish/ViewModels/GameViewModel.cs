@@ -16,9 +16,10 @@ namespace Rmjcs.Simonish.ViewModels
     /// </summary>
     internal class GameViewModel : INotifyPropertyChanged, IDisposable
     {
-        // Create a constant colour array for each button's unlit/lit colour [button index, Unlit|Lit]
+        // Create a constant colour array for each button's unlit/lit colour [button index, Unlit|Lit].
+        // An array initialiser is not a compile time constant so we can't use the const keyword.
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-        private static readonly Color[,] Colours = new Color[,] {
+        private static readonly Color[,] Colours = {
             {Color.FromRgb(0, 128, 0), Color.FromRgb(0, 255, 0)},
             {Color.FromRgb(128, 0, 0), Color.FromRgb(255, 0, 0)},
             {Color.FromRgb(128, 128, 0), Color.FromRgb(255, 255, 0)},
