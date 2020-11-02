@@ -107,7 +107,17 @@ namespace UITests
             {
                 Thread.Sleep(1000);
             }
+        }
 
+        [Test]
+        public void BackButton()
+        {
+            // Backing out of a new app will destroy the activity and run all the Dispose code.
+            _app.Back();
+
+            // Start another app and back again.
+            IApp app1 = AppInitializer.StartApp(_platform);
+            app1.Back();
         }
     }
 }
