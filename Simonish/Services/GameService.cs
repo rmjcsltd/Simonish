@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 using Rmjcs.Simonish.Helpers;
 using Rmjcs.Simonish.Models;
 
@@ -11,22 +10,18 @@ namespace Rmjcs.Simonish.Services
     /// <summary>
     /// A class to manage playing the game.
     /// </summary>
-    internal class GameService : IDisposable
+    internal class GameService : INewResultSource, IDisposable
     {
         private readonly IXamarinWrapper _xamarinWrapper;
-        private readonly IFileHelper _fileHelper;
-        private readonly ResultsService _resultsService;
         private readonly SynchronizationContext _synchronisationContext;
         private readonly ITimer _timer;
         private readonly Game _game;
 
-        public GameService(IXamarinWrapper xamarinWrapper, IFileHelper fileHelper, ITimer timer, ResultsService resultsService)
+        public GameService(IXamarinWrapper xamarinWrapper, ITimer timer)
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             _xamarinWrapper = xamarinWrapper;
-            _fileHelper = fileHelper;
-            _resultsService = resultsService;
             _synchronisationContext = xamarinWrapper.MainSynchronizationContext;
 
             _game = new Game();
@@ -79,14 +74,7 @@ namespace Rmjcs.Simonish.Services
             _game.EndPlay();
             Result result = _game.GetResult();
 
-            Task task = Task.Run(() => _resultsService.MergeNewGameResult(result));
-
-            // If MergeNewGameResult errors it should be safe to just log it and continue.
-            // As well as logging any task exception this also observes it, avoiding any chance of a TaskScheduler.UnobservedTaskException.
-            task.ContinueWith(t => _fileHelper.LogException(t.Exception.GetBaseException()),
-                              CancellationToken.None,
-                              TaskContinuationOptions.OnlyOnFaulted,
-                              TaskScheduler.Current);
+            OnNewResult(result);
         }
 
         #endregion
@@ -98,6 +86,22 @@ namespace Rmjcs.Simonish.Services
         public event EventHandler<CountdownEventArgs> CountdownTimer;
 
         public event EventHandler<PlayEventArgs> PlayTimer;
+
+        public event EventHandler<NewResultEventArgs> NewResult;
+
+        private void OnNewResult(Result result)
+        {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
+            NewResultEventArgs args = new NewResultEventArgs { Result = result };
+            EventHandler<NewResultEventArgs> handler = NewResult;
+            if (handler != null)
+            {
+                // This event is not directly for the UI but raising events on the supplied sync context follows the pattern for all other events.
+                // This is an asynchronous Post because the handling of this event will not change game state.
+                _synchronisationContext.Post(o => handler.Invoke(this, args), null);
+            }
+        }
 
         #endregion
 

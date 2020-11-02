@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using Rmjcs.Simonish.Models;
 
 namespace UnitTests
@@ -6,6 +7,26 @@ namespace UnitTests
     class ResultTests
     {
         // Remember: NUnit uses a single instance for all tests !!!
+
+        [Test]
+        public void ConstructorBad_Test()
+        {
+            // Text can't be null.
+            string gameResultText = null;
+            Assert.Throws<ArgumentNullException>(() => _ = new Result(gameResultText));
+
+            // Text is too short.
+            gameResultText = "1\t2";
+            Assert.Throws<FormatException>(() => _ = new Result(gameResultText));
+
+            // Text is not numbers.
+            gameResultText = "1\t2\tr";
+            Assert.Throws<FormatException>(() => _ = new Result(gameResultText));
+            gameResultText = "1\tr\t3";
+            Assert.Throws<FormatException>(() => _ = new Result(gameResultText));
+            gameResultText = "r\t2\t3";
+            Assert.Throws<FormatException>(() => _ = new Result(gameResultText));
+        }
 
         [Test]
         public void GameScore_Test()

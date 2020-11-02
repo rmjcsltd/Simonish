@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using Rmjcs.Simonish.Helpers;
 using Rmjcs.Simonish.ViewModels;
 using UnitTests.Helpers;
@@ -26,7 +27,7 @@ namespace UnitTests
 
             Assert.False(string.IsNullOrWhiteSpace(s));
 
-            bool isInt = int.TryParse(s, out int i);
+            bool isInt = int.TryParse(s, out int _);
 
             Assert.True(isInt);
         }
@@ -60,6 +61,10 @@ namespace UnitTests
             AboutViewModel aboutViewModel = new AboutViewModel(xamarinWrapper);
 
             aboutViewModel.ShowWebPageCommand.Execute(null);
+            Assert.Throws<ArgumentOutOfRangeException>(() => aboutViewModel.ShowWebPageCommand.Execute(0));
+            aboutViewModel.ShowWebPageCommand.Execute(1);
+            aboutViewModel.ShowWebPageCommand.Execute(2);
+            Assert.Throws<ArgumentOutOfRangeException>(() => aboutViewModel.ShowWebPageCommand.Execute(3));
         }
     }
 }

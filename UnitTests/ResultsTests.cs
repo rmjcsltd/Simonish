@@ -64,5 +64,27 @@ namespace UnitTests
             Assert.AreEqual(gameResultsText, results.ToString());
         }
 
+        [Test]
+        public void SerialiseDeserialiseBad_Test()
+        {
+            // First char of line is not B or L.
+            string gameResultsText = "X1\t2\t3";
+            Assert.Throws<FormatException>(() => _ = new Results(gameResultsText));
+            
+            gameResultsText = "b1\t2\t3";
+            Assert.Throws<FormatException>(() => _ = new Results(gameResultsText));
+            
+            gameResultsText = "l1\t2\t3";
+            Assert.Throws<FormatException>(() => _ = new Results(gameResultsText));
+
+            // Line not long enough.
+            
+            gameResultsText = "B1";
+            Assert.Throws<FormatException>(() => _ = new Results(gameResultsText));
+            
+            gameResultsText = "L1";
+            Assert.Throws<FormatException>(() => _ = new Results(gameResultsText));
+
+        }
     }
 }

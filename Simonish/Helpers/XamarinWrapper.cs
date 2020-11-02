@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using Xamarin.Essentials; // This should be the only class using Xamarin.Essentials.
 
@@ -18,6 +19,11 @@ namespace Rmjcs.Simonish.Helpers
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), null);
 
             MainThreadSynchronizationContext = MainThread.GetMainThreadSynchronizationContextAsync().Result;
+        }
+
+        public void DebugAssertMainSynchronizationContextIsCorrect()
+        {
+            Debug.Assert(MainSynchronizationContext == MainThread.GetMainThreadSynchronizationContextAsync().Result);
         }
 
         public bool IsMainThread => MainThread.IsMainThread;

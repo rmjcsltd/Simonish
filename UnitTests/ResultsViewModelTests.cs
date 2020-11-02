@@ -40,6 +40,22 @@ namespace UnitTests
         }
 
         [Test]
+        public void GetNewResultListener_Test()
+        {
+            // ToDo: This duplicates CreateResultsViewModel because we need access to _resultsService.
+
+            IXamarinWrapper xamarinWrapper = new XamarinWrapperStub();
+            IFileHelper fileHelper = new FileHelperStub();
+            ResultsService resultsService = new ResultsService(xamarinWrapper, fileHelper);
+
+            ResultsViewModel resultsViewModel = new ResultsViewModel(xamarinWrapper, resultsService);
+
+            INewResultListener newResultListener = resultsViewModel.GetNewResultListener();
+
+            Assert.AreSame(resultsService, newResultListener);
+        }
+
+        [Test]
         public void PropertyTests()
         {
             ResultsViewModel resultsViewModel = CreateResultsViewModel();

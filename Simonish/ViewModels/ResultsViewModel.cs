@@ -14,6 +14,7 @@ namespace Rmjcs.Simonish.ViewModels
     internal class ResultsViewModel : INotifyPropertyChanged
     {
         private readonly IXamarinWrapper _xamarinWrapper;
+        private readonly ResultsService _resultsService;
 
         private readonly Results _results;
 
@@ -24,6 +25,7 @@ namespace Rmjcs.Simonish.ViewModels
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             _xamarinWrapper = xamarinWrapper;
+            _resultsService = resultsService;
             resultsService.ResultsChanged += OnResultsChanged;
 
             // Define the initial state for bound views.
@@ -35,6 +37,8 @@ namespace Rmjcs.Simonish.ViewModels
         }
 
         #endregion
+
+        public INewResultListener GetNewResultListener() => _resultsService;
 
         #region Binding properties
 

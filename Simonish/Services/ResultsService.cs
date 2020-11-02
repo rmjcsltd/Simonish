@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Rmjcs.Simonish.Helpers;
 using Rmjcs.Simonish.Models;
 
@@ -10,7 +11,7 @@ namespace Rmjcs.Simonish.Services
     /// A class to manage the best and latest game results.
     /// </summary>
     /// <remarks>A single instance of this class is created by the ViewModelLocator.</remarks>
-    internal class ResultsService
+    internal class ResultsService: INewResultListener
     {
         private readonly SynchronizationContext _synchronisationContext;
         private readonly IFileHelper _fileHelper;
@@ -27,13 +28,6 @@ namespace Rmjcs.Simonish.Services
         }
 
         #region Public
-
-        public void InitialiseListeners()
-        {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
-
-            OnResultsChanged(true, true);
-        }
 
         /// <summary>
         /// Load Results from file into the BestResults and LatestResults lists.
@@ -69,13 +63,27 @@ namespace Rmjcs.Simonish.Services
             OnResultsChanged(bestChanged, latestChanged);
         }
 
+        public void NewResultSourceNewResult(object sender, NewResultEventArgs e)
+        {
+            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
+
+            Task task = Task.Run(() => MergeNewGameResult(e.Result));
+
+            // If MergeNewGameResult errors it should be safe to just log it and continue.
+            // As well as logging any task exception this also observes it, avoiding any chance of a TaskScheduler.UnobservedTaskException.
+            task.ContinueWith(t => _fileHelper.LogException(t.Exception.GetBaseException()),
+                              CancellationToken.None,
+                              TaskContinuationOptions.OnlyOnFaulted,
+                              TaskScheduler.Current);
+        }
+
         /// <summary>
         /// Merge a new Result into the BestResults and LatestResults lists.
         /// </summary>
         /// <param name="result">The Result to merge.</param>
         /// <remarks>A 'new' Result is one from game play, not loaded from file.</remarks>
         /// <exception cref="ArgumentNullException"><paramref name="result"/> is <see langword="null"/></exception>
-        public void MergeNewGameResult(Result result)
+        internal void MergeNewGameResult(Result result)
         {
             // This is called via Task.Run.
 

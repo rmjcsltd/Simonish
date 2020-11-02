@@ -17,6 +17,8 @@ namespace Rmjcs.Simonish.Helpers
         /// </summary>
         SynchronizationContext MainSynchronizationContext { get; }
 
+        void DebugAssertMainSynchronizationContextIsCorrect();
+
         /// <summary>
         /// Get the file path where the app data can be written/read.
         /// </summary>

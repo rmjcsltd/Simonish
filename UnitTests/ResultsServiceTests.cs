@@ -100,6 +100,13 @@ namespace UnitTests
         }
 
         [Test]
+        public void MergeNewGameResultNull_Test()
+        {
+            ResultsService resultsService = CreateScoresService(0);
+            Assert.Throws<ArgumentNullException>(() => resultsService.MergeNewGameResult(null));
+        }
+
+        [Test]
         public void MergeAscendingNewResults_Test([Range(1, MaxResults + 2)] int n)
         {
             // This tests Score sorting.

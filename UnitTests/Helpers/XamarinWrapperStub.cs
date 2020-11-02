@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using Rmjcs.Simonish.Helpers;
 
@@ -14,6 +15,11 @@ namespace UnitTests.Helpers
         public bool IsMainThread => true;
 
         public SynchronizationContext MainSynchronizationContext { get; }
+        
+        public void DebugAssertMainSynchronizationContextIsCorrect()
+        {
+            Debug.Assert(MainSynchronizationContext == SynchronizationContext.Current);
+        }
 
         public string AppDataDirectory => Path.GetTempPath();
         

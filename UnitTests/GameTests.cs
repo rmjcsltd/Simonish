@@ -12,7 +12,7 @@ namespace UnitTests
         [Test]
         public void Constructor_Test()
         {
-            Game game = new Game();
+            _ = new Game();
         }
 
         [Test]
@@ -83,6 +83,54 @@ namespace UnitTests
         }
 
         [Test]
+        public void TimeLeft_Test()
+        {
+            using (Game game = new Game())
+            {
+                // GamePhase.Launched
+                Assert.AreEqual(1, game.TimeLeft);
+
+                game.StartCountdown();
+                Assert.AreEqual(1, game.TimeLeft);
+
+                for (int i = 0; i < Constants.CountdownSteps; i++)
+                {
+                    game.DecrementCountdown();
+                }
+
+                game.StartPlay();
+                Assert.Greater(game.TimeLeft, 0);
+
+                game.EndPlay();
+                Assert.AreEqual(0, game.TimeLeft);
+
+                // Start a 2nd game from GameOver rather than Launched.
+                game.StartCountdown();
+                Assert.AreEqual(1, game.TimeLeft);
+            }
+        }
+
+        [Test]
+        public void DecrementCountdown_Test()
+        {
+            using (Game game = new Game())
+            {
+                // GamePhase.Launched
+                Assert.Throws<InvalidOperationException>(() => game.DecrementCountdown());
+
+                game.StartCountdown();
+
+                for (int i = 0; i < Constants.CountdownSteps; i++)
+                {
+                    game.DecrementCountdown();
+                }
+
+                // Can't countdown beyond zero.
+                Assert.Throws<InvalidOperationException>(() => game.DecrementCountdown());
+            }
+        }
+
+        [Test]
         public void MethodOrder_Test()
         {
             using (Game game = new Game())
@@ -98,7 +146,7 @@ namespace UnitTests
 
                 Assert.Throws<InvalidOperationException>(() => game.StartCountdown());
                 //Assert.Throws<InvalidOperationException>(() => game.DecrementCountdown());
-                //Assert.Throws<InvalidOperationException>(() => game.StartPlay());
+                Assert.Throws<InvalidOperationException>(() => game.StartPlay());
                 Assert.Throws<InvalidOperationException>(() => game.RecordHit(0));
                 Assert.Throws<InvalidOperationException>(() => game.EndPlay());
                 Assert.Throws<InvalidOperationException>(() => game.GetResult());
@@ -107,7 +155,7 @@ namespace UnitTests
 
                 Assert.Throws<InvalidOperationException>(() => game.StartCountdown());
                 //Assert.Throws<InvalidOperationException>(() => game.DecrementCountdown());
-                //Assert.Throws<InvalidOperationException>(() => game.StartPlay());
+                Assert.Throws<InvalidOperationException>(() => game.StartPlay());
                 Assert.Throws<InvalidOperationException>(() => game.RecordHit(0));
                 Assert.Throws<InvalidOperationException>(() => game.EndPlay());
                 Assert.Throws<InvalidOperationException>(() => game.GetResult());

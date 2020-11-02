@@ -2,6 +2,7 @@
 using System.Threading;
 using NUnit.Framework;
 using Rmjcs.Simonish.Helpers;
+using Rmjcs.Simonish.Models;
 using Rmjcs.Simonish.Services;
 using Rmjcs.Simonish.ViewModels;
 using UnitTests.Helpers;
@@ -21,10 +22,8 @@ namespace UnitTests
         private static GameViewModel CreateGameViewModel(ManualTimer manualTimer = null)
         {
             IXamarinWrapper xamarinWrapper = new XamarinWrapperStub();
-            IFileHelper fileHelper = new FileHelperStub(0);
             manualTimer = manualTimer ?? new ManualTimer();
-            ResultsService resultsService = new ResultsService(xamarinWrapper, fileHelper);
-            GameService gameService = new GameService(xamarinWrapper, fileHelper, manualTimer, resultsService);
+            GameService gameService = new GameService(xamarinWrapper, manualTimer);
 
             GameViewModel gameViewModel = new GameViewModel(xamarinWrapper, gameService);
 
@@ -52,11 +51,36 @@ namespace UnitTests
         }
 
         [Test]
+        public void GetNewResultSource_Test()
+        {
+            // ToDo: This duplicates CreateResultsViewModel because we need access to _resultsService.
+
+            IXamarinWrapper xamarinWrapper = new XamarinWrapperStub();
+            ManualTimer manualTimer = new ManualTimer();
+            GameService gameService = new GameService(xamarinWrapper, manualTimer);
+
+            GameViewModel gameViewModel = new GameViewModel(xamarinWrapper, gameService);
+
+            INewResultSource newResultSource = gameViewModel.GetNewResultSource();
+
+            Assert.AreSame(gameService, newResultSource);
+        }
+
+        [Test]
         public void PlayTest()
         {
             ManualTimer manualTimer = new ManualTimer();
             using (GameViewModel gameViewModel = CreateGameViewModel(manualTimer))
             {
+                int newResultCount = 0;
+                Result newResult = null;
+                gameViewModel.GetNewResultSource().NewResult += (sender, args) =>
+                {
+                    newResultCount++;
+                    newResult = args.Result;
+                };
+
+
                 Assert.IsTrue(gameViewModel.StartCommand.CanExecute(null));
                 Assert.IsFalse(gameViewModel.HitCommand.CanExecute(null));
                 Assert.IsTrue(gameViewModel.OverlayIsVisible);
@@ -97,6 +121,8 @@ namespace UnitTests
 
                 Assert.Throws<ArgumentOutOfRangeException>(() => gameViewModel.HitCommand.Execute(Constants.TargetCount));
 
+                Assert.AreEqual(0, newResultCount);
+
                 double timeLeft = gameViewModel.TimeLeft;
 
                 for (int i = 0; i < Constants.PlaySeconds; i++)
@@ -108,6 +134,9 @@ namespace UnitTests
                 }
 
                 Assert.AreEqual(0, timeLeft);
+                Assert.AreEqual(1, newResultCount);
+                //Assert.NotNull(newResult);
+                Assert.AreEqual(Constants.TargetCount, newResult.CorrectHits + newResult.IncorrectHits);
 
                 Assert.IsTrue(gameViewModel.StartCommand.CanExecute(null));
                 Assert.IsFalse(gameViewModel.HitCommand.CanExecute(null));

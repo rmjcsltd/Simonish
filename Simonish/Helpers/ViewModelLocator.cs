@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Rmjcs.Simonish.Pages;
 using Rmjcs.Simonish.Services;
 using Rmjcs.Simonish.ViewModels;
@@ -15,7 +17,6 @@ namespace Rmjcs.Simonish.Helpers
     {
         // These are the objects that there must only be one of in the app.
         // The classes do not use the singleton pattern because it's not very unit testable.
-        private static readonly ResultsService ResultsService;
         private static readonly IXamarinWrapper XamarinWrapper;
         private static readonly IFileHelper FileHelper;
 
@@ -32,7 +33,6 @@ namespace Rmjcs.Simonish.Helpers
 
             XamarinWrapper = new XamarinWrapper();
             FileHelper = new FileHelper(XamarinWrapper);
-            ResultsService = new ResultsService(XamarinWrapper, FileHelper);
         }
 
         // The getter for the AutoWireViewModel property.
@@ -57,6 +57,9 @@ namespace Rmjcs.Simonish.Helpers
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), null);
 
+            // The app may (or may not) have been restarted, make sure the statically cached synchronisation context is still correct.
+            XamarinWrapper.DebugAssertMainSynchronizationContextIsCorrect();
+
             object viewModel;
 
             if (bindable.GetType() == typeof(AboutPage))
@@ -66,12 +69,22 @@ namespace Rmjcs.Simonish.Helpers
             else if (bindable.GetType() == typeof(GamePage))
             {
                 ITimer timer = new OneSecondTimer();
-                GameService gameService = new GameService(XamarinWrapper, FileHelper, timer, ResultsService);
+                GameService gameService = new GameService(XamarinWrapper, timer);
                 viewModel = new GameViewModel(XamarinWrapper, gameService);
             }
             else if (bindable.GetType() == typeof(ResultsPage))
             {
-                viewModel = new ResultsViewModel(XamarinWrapper, ResultsService);
+                ResultsService resultsService = new ResultsService(XamarinWrapper, FileHelper);
+                viewModel = new ResultsViewModel(XamarinWrapper, resultsService);
+
+                Task task = Task.Run(resultsService.LoadResults);
+
+                // If LoadResults errors it should be safe to just log it and continue.
+                // As well as logging any task exception this also observes it, avoiding any chance of a TaskScheduler.UnobservedTaskException.
+                task.ContinueWith(t => FileHelper.LogException(t.Exception.GetBaseException()),
+                    CancellationToken.None,
+                    TaskContinuationOptions.OnlyOnFaulted,
+                    TaskScheduler.Current);
             }
             else
             {
@@ -79,33 +92,6 @@ namespace Rmjcs.Simonish.Helpers
             }
 
             bindable.BindingContext = viewModel;
-
-            if (bindable.GetType() == typeof(ResultsPage))
-            {
-                ResultsService.InitialiseListeners();
-            }
-        }
-
-        /// <summary>
-        /// Get the single app instance of the <see cref="ResultsService"/>.
-        /// </summary>
-        /// <returns></returns>
-        public static ResultsService ResolveScoresService()
-        {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), null);
-
-            return ResultsService;
-        }
-
-        /// <summary>
-        /// Get the single app instance of the <see cref="IFileHelper"/>.
-        /// </summary>
-        /// <returns></returns>
-        public static IFileHelper ResolveIFileHelper()
-        {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), null);
-
-            return FileHelper;
         }
     }
 }

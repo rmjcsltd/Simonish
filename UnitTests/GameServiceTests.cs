@@ -20,10 +20,8 @@ namespace UnitTests
         public void Constructor_Test()
         {
             IXamarinWrapper xamarinWrapper = new XamarinWrapperStub();
-            IFileHelper fileHelper = new FileHelperStub();
             ManualTimer manualTimer = new ManualTimer();
-            ResultsService resultsService = new ResultsService(xamarinWrapper, fileHelper);
-            GameService gameService = new GameService(xamarinWrapper, fileHelper, manualTimer, resultsService);
+            _ = new GameService(xamarinWrapper, manualTimer);
         }
     }
 }

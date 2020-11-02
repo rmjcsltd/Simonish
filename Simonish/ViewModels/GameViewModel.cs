@@ -75,6 +75,8 @@ namespace Rmjcs.Simonish.ViewModels
 
         #endregion
 
+        public INewResultSource GetNewResultSource() => _gameService;
+
         #region Commands
 
         public ICommand StartCommand { get; }

@@ -24,6 +24,8 @@ namespace UnitTests
             Assert.IsTrue(xamarinWrapperStub.IsMainThread);
 
             Assert.AreSame(SynchronizationContext.Current, xamarinWrapperStub.MainSynchronizationContext);
+
+            xamarinWrapperStub.DebugAssertMainSynchronizationContextIsCorrect();
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System;
 using Rmjcs.Simonish.Helpers;
 using Rmjcs.Simonish.Pages;
 using Rmjcs.Simonish.Services;
+using Rmjcs.Simonish.ViewModels;
 using Xamarin.Forms;
 
 namespace Rmjcs.Simonish
@@ -12,7 +12,7 @@ namespace Rmjcs.Simonish
     /// </summary>
     public partial class App : Application
     {
-        private static bool _resultsLoadedCalled;
+        private bool _isStarted;
 
         /// <summary>
         /// Initialises a new instance of the <see cref="App"/> class.
@@ -29,25 +29,42 @@ namespace Rmjcs.Simonish
         /// <summary>
         /// Called when the application starts.
         /// </summary>
+        /// <exception cref="InvalidOperationException">Failed to get GameViewModel from MainPage.InternalChildren.</exception>
+        /// <exception cref="InvalidOperationException">Failed to get ResultsViewModel from MainPage.InternalChildren.</exception>
         protected override void OnStart()
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            if (!_resultsLoadedCalled)
+            // It is possible for OnStart to be called more than once so we need to track whether we have already done this.
+            //    see https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/app-lifecycle
+
+            if (!_isStarted)
             {
-                ResultsService resultsService = ViewModelLocator.ResolveScoresService();
-                IFileHelper fileHelper = ViewModelLocator.ResolveIFileHelper();
+                GameViewModel gameViewModel = null;
+                ResultsViewModel resultsViewModel = null;
 
-                Task task = Task.Run(resultsService.LoadResults);
+                foreach (Element element in MainPage.InternalChildren)
+                {
+                    if (element is GamePage gamePage) gameViewModel = (GameViewModel)gamePage.BindingContext;
+                    if (element is ResultsPage resultsPage) resultsViewModel = (ResultsViewModel)resultsPage.BindingContext;
+                }
 
-                // If LoadResults errors it should be safe to just log it and continue.
-                // As well as logging any task exception this also observes it, avoiding any chance of a TaskScheduler.UnobservedTaskException.
-                task.ContinueWith(t => fileHelper.LogException(t.Exception.GetBaseException()),
-                    CancellationToken.None,
-                    TaskContinuationOptions.OnlyOnFaulted,
-                    TaskScheduler.Current);
+                if (gameViewModel == null)
+                {
+                    throw new InvalidOperationException("Failed to get GameViewModel from MainPage.InternalChildren.");
+                }
 
-                _resultsLoadedCalled = true;
+                if (resultsViewModel == null)
+                {
+                    throw new InvalidOperationException("Failed to get ResultsViewModel from MainPage.InternalChildren.");
+                }
+
+                INewResultSource source = gameViewModel.GetNewResultSource();
+                INewResultListener listener = resultsViewModel.GetNewResultListener();
+
+                source.NewResult += listener.NewResultSourceNewResult;
+
+                _isStarted = true;
             }
         }
     }
