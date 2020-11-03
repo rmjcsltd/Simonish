@@ -39,8 +39,10 @@ namespace Rmjcs.Simonish.Services
                 string text = _fileHelper.ReadResultsFile();
                 results = new Results(text);
             }
-            catch (Exception e)
+            catch (Exception e) when (e is FileException || e is FormatException)
             {
+                // If there is a file or format exception then just log it and carry on
+                // without loading any results.
                 _fileHelper.LogException(e);
                 return;
             }
@@ -115,8 +117,10 @@ namespace Rmjcs.Simonish.Services
                 string text = _results.ToString();
                 _fileHelper.WriteResultsFile(text);
             }
-            catch (Exception e)
+            catch (FileException e)
             {
+                // If there is a file exception then just log it and carry on,
+                // if it is temporary the save might work next time.
                 _fileHelper.LogException(e);
             }
         }

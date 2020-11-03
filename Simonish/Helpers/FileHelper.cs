@@ -14,6 +14,10 @@ namespace Rmjcs.Simonish.Helpers
 
         private readonly object _resultsFileLocker = new object();
 
+        /// <summary>
+        /// Initialises a new instance of the <see cref="FileHelper"/> class.
+        /// </summary>
+        /// <param name="xamarinWrapper">The IXamarinWrapper to use to get the app data directory.</param>
         public FileHelper(IXamarinWrapper xamarinWrapper)
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
@@ -31,7 +35,14 @@ namespace Rmjcs.Simonish.Helpers
             {
                 if (File.Exists(_resultsFileFullName))
                 {
-                    text = File.ReadAllText(_resultsFileFullName);
+                    try
+                    {
+                        text = File.ReadAllText(_resultsFileFullName);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new FileException("An error occurred whilst trying to read the text from the results file.", e);
+                    }
                 }
             }
 
@@ -44,7 +55,14 @@ namespace Rmjcs.Simonish.Helpers
 
             lock (_resultsFileLocker)
             {
-                File.WriteAllText(_resultsFileFullName, text);
+                try
+                {
+                    File.WriteAllText(_resultsFileFullName, text);
+                }
+                catch (Exception e)
+                {
+                    throw new FileException("An error occurred whilst trying to write the text to the results file.", e);
+                }
             }
         }
 
