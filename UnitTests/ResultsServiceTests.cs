@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Rmjcs.Simonish.Models;
 using Rmjcs.Simonish.Services;
 using UnitTests.Helpers;
-using System.Threading;
 using Rmjcs.Simonish.Helpers;
 
 namespace UnitTests
@@ -16,17 +15,10 @@ namespace UnitTests
         // Pre-calculate the greater of MaxBestResults and MaxLatestResults.
         private const int MaxResults = Constants.MaxBestResults > Constants.MaxLatestResults ? Constants.MaxBestResults : Constants.MaxLatestResults;
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            SynchronizationContext.SetSynchronizationContext(new TestSynchronizationContext());
-        }
-
         private static ResultsService CreateResultsService(int countError)
         {
-            IXamarinWrapper xamarinWrapper = new XamarinWrapperStub();
             IFileHelper fileHelper = new FileHelperStub(countError);
-            ResultsService resultsService = new ResultsService(xamarinWrapper, fileHelper);
+            ResultsService resultsService = new ResultsService(fileHelper);
 
             return resultsService;
         }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -14,7 +12,7 @@ namespace Rmjcs.Simonish.ViewModels
     /// <summary>
     /// A ViewModel for the Play page.
     /// </summary>
-    internal class GameViewModel : INotifyPropertyChanged, IDisposable
+    internal class GameViewModel : INotifyPropertyChanged
     {
         // Create a constant colour array for each button's unlit/lit colour [button index, Unlit|Lit].
         // An array initialiser is not a compile time constant so we can't use the const keyword.
@@ -41,12 +39,11 @@ namespace Rmjcs.Simonish.ViewModels
         private bool _canStart;
         private bool _canHit;
 
-        private readonly IXamarinWrapper _xamarinWrapper;
         private readonly GameService _gameService;
 
         #region Construction & Initialisation
 
-        public GameViewModel(IXamarinWrapper xamarinWrapper, GameService gameService)
+        public GameViewModel(GameService gameService)
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
@@ -67,7 +64,6 @@ namespace Rmjcs.Simonish.ViewModels
 
             ButtonColours = new[] { Colours[0, 0], Colours[1, 0], Colours[2, 0], Colours[3, 0] };
 
-            _xamarinWrapper = xamarinWrapper;
             _gameService = gameService;
             _gameService.PhaseChangeRequired += GameServicePhaseChangeRequired;
             _gameService.CountdownTimer += GameServiceCountdownTimer;
@@ -194,9 +190,6 @@ namespace Rmjcs.Simonish.ViewModels
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            // Note: This ViewModel assumes events are raised on the UI thread.
-            Debug.Assert(_xamarinWrapper.IsMainThread);
-
             switch (args.NewGamePhase)
             {
                 case GamePhase.Playing:
@@ -229,18 +222,12 @@ namespace Rmjcs.Simonish.ViewModels
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            // Note: This ViewModel assumes events are raised on the UI thread.
-            Debug.Assert(_xamarinWrapper.IsMainThread);
-
             OverlayText = e.Countdown.ToString("0", CultureInfo.CurrentCulture);
         }
 
         private void GameServicePlayTimer(object sender, PlayEventArgs e)
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
-
-            // Note: This ViewModel assumes events are raised on the UI thread.
-            Debug.Assert(_xamarinWrapper.IsMainThread);
 
             TimeLeft = e.TimeLeft;
         }
@@ -262,19 +249,5 @@ namespace Rmjcs.Simonish.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        #region IDisposable
-
-        /// <summary>
-        /// Releases all resources used by the current <see cref="GameViewModel"/>.
-        /// </summary>
-        public void Dispose()
-        {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
-
-            _gameService?.Dispose();
-        }
-
-        #endregion
     }
 }

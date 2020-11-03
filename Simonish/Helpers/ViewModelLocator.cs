@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Rmjcs.Simonish.Pages;
 using Rmjcs.Simonish.Services;
 using Rmjcs.Simonish.ViewModels;
@@ -57,9 +55,6 @@ namespace Rmjcs.Simonish.Helpers
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), null);
 
-            // The app may (or may not) have been restarted, make sure the statically cached synchronisation context is still correct.
-            XamarinWrapper.DebugAssertMainSynchronizationContextIsCorrect();
-
             object viewModel;
 
             if (bindable.GetType() == typeof(AboutPage))
@@ -70,21 +65,13 @@ namespace Rmjcs.Simonish.Helpers
             {
                 ITimer timer = new OneSecondTimer();
                 GameService gameService = new GameService(XamarinWrapper, timer);
-                viewModel = new GameViewModel(XamarinWrapper, gameService);
+                viewModel = new GameViewModel(gameService);
             }
             else if (bindable.GetType() == typeof(ResultsPage))
             {
-                ResultsService resultsService = new ResultsService(XamarinWrapper, FileHelper);
-                viewModel = new ResultsViewModel(XamarinWrapper, resultsService);
-
-                Task task = Task.Run(resultsService.LoadResults);
-
-                // If LoadResults errors it should be safe to just log it and continue.
-                // As well as logging any task exception this also observes it, avoiding any chance of a TaskScheduler.UnobservedTaskException.
-                task.ContinueWith(t => FileHelper.LogException(t.Exception.GetBaseException()),
-                    CancellationToken.None,
-                    TaskContinuationOptions.OnlyOnFaulted,
-                    TaskScheduler.Current);
+                ResultsService resultsService = new ResultsService(FileHelper);
+                viewModel = new ResultsViewModel(resultsService);
+                resultsService.LoadResults();
             }
             else
             {

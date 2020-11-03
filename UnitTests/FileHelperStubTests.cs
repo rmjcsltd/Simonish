@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using NUnit.Framework;
 using Rmjcs.Simonish.Helpers;
 using Rmjcs.Simonish.Models;
@@ -15,16 +14,10 @@ namespace UnitTests
         // Pre-calculate the greater of MaxBestResults and MaxLatestResults.
         private const int MaxResults = Constants.MaxBestResults > Constants.MaxLatestResults ? Constants.MaxBestResults : Constants.MaxLatestResults;
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            SynchronizationContext.SetSynchronizationContext(new TestSynchronizationContext());
-        }
-
         [Test]
         public void LogExceptionTests()
         {
-            FileHelperStub fileHelperStub = new FileHelperStub();
+            IFileHelper fileHelperStub = new FileHelperStub();
 
             fileHelperStub.LogException(new Exception());
         }
@@ -32,7 +25,7 @@ namespace UnitTests
         [Test]
         public void SaveResultsTests()
         {
-            FileHelperStub fileHelperStub = new FileHelperStub();
+            IFileHelper fileHelperStub = new FileHelperStub();
 
             Results results = new Results();
 
@@ -43,7 +36,7 @@ namespace UnitTests
         [Test]
         public void LoadResultsTests([Range(1, MaxResults + 2)] int n)
         {
-            FileHelperStub fileHelperStub = new FileHelperStub();
+            IFileHelper fileHelperStub = new FileHelperStub();
 
             string text = fileHelperStub.ReadResultsFile();
             Results results = new Results(text);

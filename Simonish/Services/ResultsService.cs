@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Rmjcs.Simonish.Helpers;
 using Rmjcs.Simonish.Models;
 
@@ -11,17 +9,15 @@ namespace Rmjcs.Simonish.Services
     /// A class to manage the best and latest game results.
     /// </summary>
     /// <remarks>A single instance of this class is created by the ViewModelLocator.</remarks>
-    internal class ResultsService: INewResultListener
+    internal class ResultsService : INewResultListener
     {
-        private readonly SynchronizationContext _synchronisationContext;
         private readonly IFileHelper _fileHelper;
         private readonly Results _results;
 
-        public ResultsService(IXamarinWrapper xamarinWrapper, IFileHelper fileHelper)
+        public ResultsService(IFileHelper fileHelper)
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            _synchronisationContext = xamarinWrapper.MainSynchronizationContext;
             _fileHelper = fileHelper;
 
             _results = new Results();
@@ -36,13 +32,22 @@ namespace Rmjcs.Simonish.Services
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            // This is called via Task.Run.
+            Results results;
 
-            string text = _fileHelper.ReadResultsFile();
-            Results results = new Results(text);
+            try
+            {
+                string text = _fileHelper.ReadResultsFile();
+                results = new Results(text);
+            }
+            catch (Exception e)
+            {
+                _fileHelper.LogException(e);
+                return;
+            }
 
-            // These results have *probably* been loaded before any played games,
-            // but just in case we merge them in individually.
+            // These results have been loaded before any played games, but we merge them in
+            // individually to ensure correct order and number of results regardless of what was
+            // read from file.
 
             bool bestChanged = false;
             List<Result> bestResults = new List<Result>(_results.BestResults);
@@ -67,14 +72,7 @@ namespace Rmjcs.Simonish.Services
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            Task task = Task.Run(() => MergeNewGameResult(e.Result));
-
-            // If MergeNewGameResult errors it should be safe to just log it and continue.
-            // As well as logging any task exception this also observes it, avoiding any chance of a TaskScheduler.UnobservedTaskException.
-            task.ContinueWith(t => _fileHelper.LogException(t.Exception.GetBaseException()),
-                              CancellationToken.None,
-                              TaskContinuationOptions.OnlyOnFaulted,
-                              TaskScheduler.Current);
+            MergeNewGameResult(e.Result);
         }
 
         /// <summary>
@@ -85,8 +83,6 @@ namespace Rmjcs.Simonish.Services
         /// <exception cref="ArgumentNullException"><paramref name="result"/> is <see langword="null"/></exception>
         internal void MergeNewGameResult(Result result)
         {
-            // This is called via Task.Run.
-
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             if (result == null)
@@ -112,16 +108,17 @@ namespace Rmjcs.Simonish.Services
         /// <summary>
         /// Save the current BestResults and LatestResults lists to file.
         /// </summary>
-        /// <returns>A task representing the asynchronous operation.</returns>
         private void SaveResults()
         {
-            Results results = new Results(_results);
-
-            // Note: SaveResults will run on a background thread and enumerate the lists it receives so
-            // we can not pass BestResults and LatestResults because they might be modified on the UI thread.
-
-            string text = results.ToString();
-            _fileHelper.WriteResultsFile(text);
+            try
+            {
+                string text = _results.ToString();
+                _fileHelper.WriteResultsFile(text);
+            }
+            catch (Exception e)
+            {
+                _fileHelper.LogException(e);
+            }
         }
 
         /// <summary>
@@ -203,16 +200,10 @@ namespace Rmjcs.Simonish.Services
             if (bestChanged) resultTypeChanged |= ResultTypeChanged.Best;
             if (latestChanged) resultTypeChanged |= ResultTypeChanged.Latest;
 
-            // Create a copy of the Results instance so we don't expose this private instance.
-            Results results = new Results(_results);
-
-            ResultsChangedEventArgs args = new ResultsChangedEventArgs { ResultTypeChanged = resultTypeChanged, Results = results };
+            // Create a copy of _results so we don't expose this private data.
+            ResultsChangedEventArgs args = new ResultsChangedEventArgs { ResultTypeChanged = resultTypeChanged, Results = new Results(_results) };
             EventHandler<ResultsChangedEventArgs> handler = ResultsChanged;
-            if (handler != null)
-            {
-                // Raise events on the supplied sync context.
-                _synchronisationContext.Post(o => handler.Invoke(this, args), null);
-            }
+            handler?.Invoke(this, args);
         }
 
         #endregion

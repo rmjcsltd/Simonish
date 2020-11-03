@@ -13,8 +13,6 @@ namespace Rmjcs.Simonish.iOS
     [Register("AppDelegate")]
     public partial class AppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
     {
-        private App _app;
-
         //
         // This method is invoked when the application has loaded and is ready to run. In this 
         // method you should instantiate the window, load the UI into it and then make the window
@@ -25,11 +23,7 @@ namespace Rmjcs.Simonish.iOS
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             global::Xamarin.Forms.Forms.Init();
-
-            // ToDo: Need to work out where/when to call _app.Dispose().
-
-            _app = new App();
-            LoadApplication(_app);
+            LoadApplication(new App());
 
             return base.FinishedLaunching(app, options);
         }

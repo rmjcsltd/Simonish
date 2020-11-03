@@ -1,25 +1,12 @@
-﻿using System.Diagnostics;
-using System.IO;
-using System.Threading;
+﻿using System.IO;
 using Rmjcs.Simonish.Helpers;
 
 namespace UnitTests.Helpers
 {
     internal class XamarinWrapperStub : IXamarinWrapper
     {
-        public XamarinWrapperStub()
-        {
-            MainSynchronizationContext = SynchronizationContext.Current;
-        }
 
         public bool IsMainThread => true;
-
-        public SynchronizationContext MainSynchronizationContext { get; }
-        
-        public void DebugAssertMainSynchronizationContextIsCorrect()
-        {
-            Debug.Assert(MainSynchronizationContext == SynchronizationContext.Current);
-        }
 
         public string AppDataDirectory => Path.GetTempPath();
         

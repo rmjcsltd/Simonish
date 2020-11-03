@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Rmjcs.Simonish.Helpers;
 using Rmjcs.Simonish.Models;
@@ -13,18 +12,16 @@ namespace Rmjcs.Simonish.ViewModels
     /// </summary>
     internal class ResultsViewModel : INotifyPropertyChanged
     {
-        private readonly IXamarinWrapper _xamarinWrapper;
         private readonly ResultsService _resultsService;
 
         private readonly Results _results;
 
         #region Construction & Initialisation
 
-        public ResultsViewModel(IXamarinWrapper xamarinWrapper, ResultsService resultsService)
+        public ResultsViewModel(ResultsService resultsService)
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            _xamarinWrapper = xamarinWrapper;
             _resultsService = resultsService;
             resultsService.ResultsChanged += ResultsServiceResultsChanged;
 
@@ -75,9 +72,6 @@ namespace Rmjcs.Simonish.ViewModels
         private void ResultsServiceResultsChanged(object sender, ResultsChangedEventArgs e)
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
-
-            // Note: This ViewModel assumes events are raised on the UI thread.
-            Debug.Assert(_xamarinWrapper.IsMainThread);
 
             if (e.ResultTypeChanged.HasFlag(ResultTypeChanged.Best))
             {

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
 using NUnit.Framework;
 using Rmjcs.Simonish.Helpers;
 using Rmjcs.Simonish.Models;
@@ -13,19 +12,12 @@ namespace UnitTests
     {
         // Remember: NUnit uses a single instance for all tests !!!
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            SynchronizationContext.SetSynchronizationContext(new TestSynchronizationContext());
-        }
-
         private static ResultsViewModel CreateResultsViewModel()
         {
-            IXamarinWrapper xamarinWrapper = new XamarinWrapperStub();
             IFileHelper fileHelper = new FileHelperStub();
-            ResultsService resultsService = new ResultsService(xamarinWrapper, fileHelper);
+            ResultsService resultsService = new ResultsService(fileHelper);
 
-            ResultsViewModel resultsViewModel = new ResultsViewModel(xamarinWrapper, resultsService);
+            ResultsViewModel resultsViewModel = new ResultsViewModel(resultsService);
 
             return resultsViewModel;
         }
@@ -44,11 +36,10 @@ namespace UnitTests
         {
             // ToDo: This duplicates CreateResultsViewModel because we need access to _resultsService.
 
-            IXamarinWrapper xamarinWrapper = new XamarinWrapperStub();
             IFileHelper fileHelper = new FileHelperStub();
-            ResultsService resultsService = new ResultsService(xamarinWrapper, fileHelper);
+            ResultsService resultsService = new ResultsService(fileHelper);
 
-            ResultsViewModel resultsViewModel = new ResultsViewModel(xamarinWrapper, resultsService);
+            ResultsViewModel resultsViewModel = new ResultsViewModel(resultsService);
 
             INewResultListener newResultListener = resultsViewModel.GetNewResultListener();
 
@@ -74,11 +65,10 @@ namespace UnitTests
         {
             // ToDo: This duplicates CreateResultsViewModel because we need access to _resultsService.
 
-            IXamarinWrapper xamarinWrapper = new XamarinWrapperStub();
             IFileHelper fileHelper = new FileHelperStub();
-            ResultsService resultsService = new ResultsService(xamarinWrapper, fileHelper);
+            ResultsService resultsService = new ResultsService(fileHelper);
 
-            ResultsViewModel resultsViewModel = new ResultsViewModel(xamarinWrapper, resultsService);
+            ResultsViewModel resultsViewModel = new ResultsViewModel(resultsService);
 
             IEnumerable<Result> bestResults = resultsViewModel.BestResults;
             IEnumerable<Result> latestResults = resultsViewModel.LatestResults;

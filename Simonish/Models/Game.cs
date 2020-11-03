@@ -1,20 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Threading;
 using Rmjcs.Simonish.Helpers;
-// ReSharper disable ExceptionNotDocumented
 
 namespace Rmjcs.Simonish.Models
 {
     /// <summary>
     /// Provides methods to manage the state of the game.
     /// </summary>
-    /// <remarks>During normal game play this object can be accessed from both the main thread and timer threads.
-    /// It's unlikely to be accessed by different threads concurrently but if event processing is very delayed
-    /// it could happen so all access is controlled by the _readerWriterLocker.</remarks>
-    internal class Game : IDisposable
+    internal class Game
     {
-        private readonly ReaderWriterLockSlim _readerWriterLocker;
         private readonly Random _randomNumberGenerator;
         private readonly int _durationMilliseconds;
         private DateTime _startTimeUtc;
@@ -23,7 +17,6 @@ namespace Rmjcs.Simonish.Models
         private int _currentTargetIndex;
         private int _correctHits;
         private int _incorrectHits;
-        private GamePhase _phase;
 
         /// <summary>
         /// Initialises a new instance of the <see cref="Game"/> class.
@@ -32,11 +25,10 @@ namespace Rmjcs.Simonish.Models
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            _readerWriterLocker = new ReaderWriterLockSlim();
             _randomNumberGenerator = new Random();
 
             _durationMilliseconds = Constants.PlaySeconds * 1000;
-            _phase = GamePhase.Launched;
+            Phase = GamePhase.Launched;
         }
 
         /// <summary>
@@ -48,24 +40,15 @@ namespace Rmjcs.Simonish.Models
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            _readerWriterLocker.EnterWriteLock();
-
-            try
+            if (!(Phase == GamePhase.Launched || Phase == GamePhase.GameOver))
             {
-                if (!(_phase == GamePhase.Launched || _phase == GamePhase.GameOver))
-                {
-                    throw new InvalidOperationException("Unexpected current game phase for this method.");
-                }
+                throw new InvalidOperationException("Unexpected current game phase for this method.");
+            }
 
-                _phase = GamePhase.Countdown;
-                _countdown = Constants.CountdownSteps;
-                _correctHits = 0;
-                _incorrectHits = 0;
-            }
-            finally
-            {
-                _readerWriterLocker.ExitWriteLock();
-            }
+            Phase = GamePhase.Countdown;
+            _countdown = Constants.CountdownSteps;
+            _correctHits = 0;
+            _incorrectHits = 0;
         }
 
         /// <summary>
@@ -77,27 +60,18 @@ namespace Rmjcs.Simonish.Models
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            _readerWriterLocker.EnterWriteLock();
-
-            try
+            if (Phase != GamePhase.Countdown)
             {
-                if (_phase != GamePhase.Countdown)
-                {
-                    throw new InvalidOperationException("Unexpected current game phase for this method.");
-                }
-
-                if (_countdown <= 0)
-                {
-                    throw new InvalidOperationException("Countdown has already completed.");
-                }
-
-                _countdown--;
-                return _countdown;
+                throw new InvalidOperationException("Unexpected current game phase for this method.");
             }
-            finally
+
+            if (_countdown <= 0)
             {
-                _readerWriterLocker.ExitWriteLock();
+                throw new InvalidOperationException("Countdown has already completed.");
             }
+
+            _countdown--;
+            return _countdown;
         }
 
         /// <summary>
@@ -110,31 +84,22 @@ namespace Rmjcs.Simonish.Models
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            _readerWriterLocker.EnterWriteLock();
-
-            try
+            if (Phase != GamePhase.Countdown)
             {
-                if (_phase != GamePhase.Countdown)
-                {
-                    throw new InvalidOperationException("Unexpected current game phase for this method.");
-                }
-
-                if (_countdown != 0)
-                {
-                    throw new InvalidOperationException("Incomplete countdown for this method.");
-                }
-
-                _phase = GamePhase.Playing;
-                _currentTargetIndex = _randomNumberGenerator.Next(Constants.TargetCount);
-                _startTimeUtc = DateTime.UtcNow;
-                _endTimeUtc = _startTimeUtc.AddMilliseconds(_durationMilliseconds);
-
-                return _currentTargetIndex;
+                throw new InvalidOperationException("Unexpected current game phase for this method.");
             }
-            finally
+
+            if (_countdown != 0)
             {
-                _readerWriterLocker.ExitWriteLock();
+                throw new InvalidOperationException("Incomplete countdown for this method.");
             }
+
+            Phase = GamePhase.Playing;
+            _currentTargetIndex = _randomNumberGenerator.Next(Constants.TargetCount);
+            _startTimeUtc = DateTime.UtcNow;
+            _endTimeUtc = _startTimeUtc.AddMilliseconds(_durationMilliseconds);
+
+            return _currentTargetIndex;
         }
 
         /// <summary>
@@ -150,50 +115,41 @@ namespace Rmjcs.Simonish.Models
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            _readerWriterLocker.EnterWriteLock();
+            // If this method is called when the phase is GameOver then GameService events are not being processed in the expected order.
 
-            try
+            if (Phase != GamePhase.Playing)
             {
-                // If this method is called when the phase is GameOver then GameService events are not being processed in the expected order.
+                throw new InvalidOperationException("Unexpected current game phase for this method.");
+            }
 
-                if (_phase != GamePhase.Playing)
+            if (targetIndex < 0 || targetIndex > Constants.TargetCount - 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(targetIndex));
+            }
+
+            // Any hits outside the game duration should be ignored.
+            // This *might* happen on slower/loaded systems when event processing is delayed.
+
+
+            if (TimeLeft > 0)
+            {
+                if (targetIndex == _currentTargetIndex)
                 {
-                    throw new InvalidOperationException("Unexpected current game phase for this method.");
-                }
-
-                if (targetIndex < 0 || targetIndex > Constants.TargetCount - 1)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(targetIndex));
-                }
-
-                // Any hits outside the game duration should be ignored.
-                // This *might* happen on slower/loaded systems when event processing is delayed.
-
-
-                if (GetTimeLeft() > 0)
-                {
-                    if (targetIndex == _currentTargetIndex)
-                    {
-                        _correctHits++;
-                    }
-                    else
-                    {
-                        _incorrectHits++;
-                    }
-
-                    _currentTargetIndex = _randomNumberGenerator.Next(Constants.TargetCount);
-
-                    int score = _correctHits - _incorrectHits;
-                    return (true, score, _currentTargetIndex);
+                    _correctHits++;
                 }
                 else
                 {
-                    return (false, 0, 0);
+                    _incorrectHits++;
                 }
+
+                _currentTargetIndex = _randomNumberGenerator.Next(Constants.TargetCount);
+
+                int score = _correctHits - _incorrectHits;
+                return (true, score, _currentTargetIndex);
             }
-            finally
+            else
             {
-                _readerWriterLocker.ExitWriteLock();
+                return (false, 0, 0);
             }
         }
 
@@ -206,21 +162,12 @@ namespace Rmjcs.Simonish.Models
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            _readerWriterLocker.EnterWriteLock();
-
-            try
+            if (Phase != GamePhase.Playing)
             {
-                if (_phase != GamePhase.Playing)
-                {
-                    throw new InvalidOperationException("Unexpected current game phase for this method.");
-                }
+                throw new InvalidOperationException("Unexpected current game phase for this method.");
+            }
 
-                _phase = GamePhase.GameOver;
-            }
-            finally
-            {
-                _readerWriterLocker.ExitWriteLock();
-            }
+            Phase = GamePhase.GameOver;
         }
 
         /// <summary>
@@ -232,41 +179,18 @@ namespace Rmjcs.Simonish.Models
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            _readerWriterLocker.EnterReadLock();
-
-            try
+            if (Phase != GamePhase.GameOver)
             {
-                if (_phase != GamePhase.GameOver)
-                {
-                    throw new InvalidOperationException("Unexpected current game phase for this method.");
-                }
+                throw new InvalidOperationException("Unexpected current game phase for this method.");
+            }
 
-                return new Result(_startTimeUtc, _correctHits, _incorrectHits);
-            }
-            finally
-            {
-                _readerWriterLocker.ExitReadLock();
-            }
+            return new Result(_startTimeUtc, _correctHits, _incorrectHits);
         }
 
         /// <summary>
         /// Gets the current phase of the game.
         /// </summary>
-        public GamePhase Phase
-        {
-            get
-            {
-                _readerWriterLocker.EnterReadLock();
-                try
-                {
-                    return _phase;
-                }
-                finally
-                {
-                    _readerWriterLocker.ExitReadLock();
-                }
-            }
-        }
+        public GamePhase Phase { get; private set; }
 
         /// <summary>
         /// Gets the proportion of the game duration remaining.
@@ -275,59 +199,22 @@ namespace Rmjcs.Simonish.Models
         {
             get
             {
-                _readerWriterLocker.EnterReadLock();
-                try
+                switch (Phase)
                 {
-                    return GetTimeLeft();
+                    case GamePhase.Launched:
+                    case GamePhase.Countdown:
+                        return 1;
+                    case GamePhase.Playing:
+                        double timeLeft = (_endTimeUtc - DateTime.UtcNow).TotalMilliseconds;
+                        return timeLeft > 0 ? timeLeft / _durationMilliseconds : 0;
+                    case GamePhase.GameOver:
+                        return 0;
+                    default:
+                        // No other values for the phase are expected (the switch should cover all possibilities).
+                        throw new InvalidEnumArgumentException(nameof(Phase), (int)Phase, typeof(GamePhase));
                 }
-                finally
-                {
-                    _readerWriterLocker.ExitReadLock();
-                }
             }
         }
-
-        /// <exception cref="InvalidOperationException">The current state of this <see cref="Game"/> is not valid for this method.</exception>
-        private double GetTimeLeft()
-        {
-            // ToDo: Should this be a property or a method?
-
-            // This private method should only be used inside a read or write lock.
-            if (!(_readerWriterLocker.IsReadLockHeld || _readerWriterLocker.IsWriteLockHeld))
-            {
-                throw new InvalidOperationException("No read or write lock found.");
-            }
-
-            switch (_phase)
-            {
-                case GamePhase.Launched:
-                case GamePhase.Countdown:
-                    return 1;
-                case GamePhase.Playing:
-                    double timeLeft = (_endTimeUtc - DateTime.UtcNow).TotalMilliseconds;
-                    return timeLeft > 0 ? timeLeft / _durationMilliseconds : 0;
-                case GamePhase.GameOver:
-                    return 0;
-                default:
-                    // No other values for the phase are expected (the switch should cover all possibilities).
-                    throw new InvalidEnumArgumentException(nameof(_phase), (int)_phase, typeof(GamePhase));
-            }
-        }
-
-        #region IDisposable
-
-        /// <summary>
-        /// Releases all resources used by the current <see cref="Game"/>.
-        /// </summary>
-        public void Dispose()
-        {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
-
-            _readerWriterLocker?.Dispose();
-        }
-
-        #endregion
-
     }
 
     /// <summary>

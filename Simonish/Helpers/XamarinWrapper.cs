@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Threading;
 using Xamarin.Essentials; // This should be the only class using Xamarin.Essentials.
 
 namespace Rmjcs.Simonish.Helpers
@@ -14,18 +12,10 @@ namespace Rmjcs.Simonish.Helpers
         public XamarinWrapper()
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
-
-            MainSynchronizationContext = MainThread.GetMainThreadSynchronizationContextAsync().Result;
         }
 
-        public void DebugAssertMainSynchronizationContextIsCorrect()
-        {
-            Debug.Assert(MainSynchronizationContext == MainThread.GetMainThreadSynchronizationContextAsync().Result);
-        }
 
         public bool IsMainThread => MainThread.IsMainThread;
-
-        public SynchronizationContext MainSynchronizationContext { get; }
 
         public string AppDataDirectory => FileSystem.AppDataDirectory;
 

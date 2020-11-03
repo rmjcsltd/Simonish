@@ -7,7 +7,7 @@ namespace Rmjcs.Simonish.Helpers
     /// <summary>
     /// An ITimer that fires once after one second.
     /// </summary>
-    /// <remarks>Note that the action will be invoked on a non-UI thread.</remarks>
+    /// <remarks>Note that the action is explicitly invoked on the UI thread.</remarks>
     internal class OneSecondTimer : ITimer
     {
         private readonly TimeSpan _oneSecond = new TimeSpan(0, 0, 1);
@@ -51,7 +51,7 @@ namespace Rmjcs.Simonish.Helpers
                 throw new InvalidOperationException("The timer should not fire if it is not running.");
             }
 
-            _action.Invoke();
+            Device.BeginInvokeOnMainThread(() => { _action.Invoke(); });
 
             return false; // don't automatically run again.
         }

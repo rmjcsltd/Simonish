@@ -10,7 +10,7 @@ namespace Rmjcs.Simonish
     /// <summary>
     /// Represents an instance of the Simonish application.
     /// </summary>
-    public sealed partial class App : Application, IDisposable
+    public sealed partial class App : Application
     {
         private bool _isStarted;
 
@@ -67,23 +67,5 @@ namespace Rmjcs.Simonish
                 _isStarted = true;
             }
         }
-
-        #region IDisposable
-
-        /// <summary>
-        /// Releases all resources used by the current <see cref="App"/>.
-        /// </summary>
-        public void Dispose()
-        {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
-
-            // Currently it's just the GamePage that needs disposing but this is a bit more future proof.
-            foreach (Element element in MainPage.InternalChildren)
-            {
-                if (element is IDisposable page) page.Dispose();
-            }
-        }
-
-        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace Rmjcs.Simonish.Helpers
+﻿namespace Rmjcs.Simonish.Helpers
 {
     /// <summary>
     /// An interface for a class to wrap components that have Xamarin dependencies which complicate unit testing.
@@ -11,13 +9,6 @@ namespace Rmjcs.Simonish.Helpers
         /// Is the current thread the main/UI thread?
         /// </summary>
         bool IsMainThread { get; }
-
-        /// <summary>
-        /// Get the sync context for the main thread.
-        /// </summary>
-        SynchronizationContext MainSynchronizationContext { get; }
-
-        void DebugAssertMainSynchronizationContextIsCorrect();
 
         /// <summary>
         /// Get the file path where the app data can be written/read.

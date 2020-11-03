@@ -1,7 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Threading;
 using Rmjcs.Simonish.Helpers;
 using Rmjcs.Simonish.Models;
 
@@ -10,10 +8,9 @@ namespace Rmjcs.Simonish.Services
     /// <summary>
     /// A class to manage playing the game.
     /// </summary>
-    internal class GameService : INewResultSource, IDisposable
+    internal class GameService : INewResultSource
     {
         private readonly IXamarinWrapper _xamarinWrapper;
-        private readonly SynchronizationContext _synchronisationContext;
         private readonly ITimer _timer;
         private readonly Game _game;
 
@@ -22,8 +19,6 @@ namespace Rmjcs.Simonish.Services
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
             _xamarinWrapper = xamarinWrapper;
-            _synchronisationContext = xamarinWrapper.MainSynchronizationContext;
-
             _game = new Game();
             _timer = timer;
             _timer.SetAction(OnTimer);
@@ -35,9 +30,6 @@ namespace Rmjcs.Simonish.Services
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            // This method is expected to be called on the main thread.
-            Debug.Assert(_xamarinWrapper.IsMainThread);
-
             _game.StartCountdown();
 
             _timer.Start();
@@ -47,9 +39,6 @@ namespace Rmjcs.Simonish.Services
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            // This method is expected to be called on the main thread.
-            Debug.Assert(_xamarinWrapper.IsMainThread);
-
             int newTargetIndex = _game.StartPlay();
             return newTargetIndex;
         }
@@ -58,18 +47,12 @@ namespace Rmjcs.Simonish.Services
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            // This method is expected to be called on the main thread.
-            Debug.Assert(_xamarinWrapper.IsMainThread);
-
             return _game.RecordHit(targetIndex);
         }
 
         public void EndPlay()
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
-
-            // This method is expected to be called on the main thread.
-            Debug.Assert(_xamarinWrapper.IsMainThread);
 
             _game.EndPlay();
             Result result = _game.GetResult();
@@ -95,12 +78,7 @@ namespace Rmjcs.Simonish.Services
 
             NewResultEventArgs args = new NewResultEventArgs { Result = result };
             EventHandler<NewResultEventArgs> handler = NewResult;
-            if (handler != null)
-            {
-                // This event is not directly for the UI but raising events on the supplied sync context follows the pattern for all other events.
-                // This is an asynchronous Post because the handling of this event will not change game state.
-                _synchronisationContext.Post(o => handler.Invoke(this, args), null);
-            }
+            handler?.Invoke(this, args);
         }
 
         #endregion
@@ -111,7 +89,10 @@ namespace Rmjcs.Simonish.Services
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            // Note: This method might be called on a thread pool thread.
+            if (!_xamarinWrapper.IsMainThread)
+            {
+                throw new InvalidOperationException("This method expects to be on the main UI thread.");
+            }
 
             // The timer has AutoReset = false so it must be re-started each time as necessary. 
             // This is done to prevent timer events backing up on very slow/busy machines.
@@ -158,53 +139,23 @@ namespace Rmjcs.Simonish.Services
             {
                 PhaseChangeRequiredEventArgs args = new PhaseChangeRequiredEventArgs { NewGamePhase = newGamePhase };
                 EventHandler<PhaseChangeRequiredEventArgs> handler = PhaseChangeRequired;
-                if (handler != null)
-                {
-                    // Raise events on the supplied sync context.
-                    // This is a synchronous Send because the handling of this event will affect game state and 
-                    // we need to know that it has been actioned before continuing.
-                    _synchronisationContext.Send(o => handler.Invoke(this, args), null);
-                }
+                handler?.Invoke(this, args);
             }
 
             void OnCountdownTimer(int countdown)
             {
                 CountdownEventArgs args = new CountdownEventArgs { Countdown = countdown };
                 EventHandler<CountdownEventArgs> handler = CountdownTimer;
-                if (handler != null)
-                {
-                    // Raise events on the supplied sync context.
-                    // This is an asynchronous Post because the handling of this event will not change game state.
-                    _synchronisationContext.Post(o => handler.Invoke(this, args), null);
-                }
+                handler?.Invoke(this, args);
             }
 
             void OnPlayTimer(double proportionLeft)
             {
                 PlayEventArgs args = new PlayEventArgs { TimeLeft = proportionLeft };
                 EventHandler<PlayEventArgs> handler = PlayTimer;
-                if (handler != null)
-                {
-                    // Raise events on the supplied sync context.
-                    // This is an asynchronous Post because the handling of this event will not change game state.
-                    _synchronisationContext.Post(o => handler.Invoke(this, args), null);
-                }
+                handler?.Invoke(this, args);
             }
 
-        }
-
-        #endregion
-
-        #region IDisposable
-
-        /// <summary>
-        /// Releases all resources used by the current <see cref="GameService"/>.
-        /// </summary>
-        public void Dispose()
-        {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
-
-            _game?.Dispose();
         }
 
         #endregion

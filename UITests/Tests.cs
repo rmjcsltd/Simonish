@@ -112,7 +112,7 @@ namespace UITests
         [Test]
         public void BackButton()
         {
-            // Backing out of a new app will destroy the activity and run all the Dispose code.
+            // Backing out of a new app will destroy the activity.
             _app.Back();
 
             // Start another app and back again.
