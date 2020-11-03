@@ -1,23 +1,22 @@
 ﻿using System;
-using System.Timers;
+using System.Threading;
+using Xamarin.Forms;
 
 namespace Rmjcs.Simonish.Helpers
 {
     /// <summary>
     /// An ITimer that fires once after one second.
     /// </summary>
-    /// <remarks>Note that the action will be invoked on a ThreadPool thread.</remarks>
+    /// <remarks>Note that the action will be invoked on a non-UI thread.</remarks>
     internal class OneSecondTimer : ITimer
     {
-        private readonly Timer _timer;
+        private readonly TimeSpan _oneSecond = new TimeSpan(0, 0, 1);
+        private long _isRunningFlag;
         private Action _action;
 
         public OneSecondTimer()
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
-
-            _timer = new Timer { Enabled = false, AutoReset = false, Interval = 1000 };
-            _timer.Elapsed += TimerElapsed;
         }
 
         /// <exception cref="ArgumentNullException"><paramref name="action"/> is <see langword="null"/></exception>
@@ -26,33 +25,35 @@ namespace Rmjcs.Simonish.Helpers
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            if (action == null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-
             // Although there's no reason why we couldn't change the action it's not an appropriate thing to do in this app.
             if (_action != null)
             {
                 throw new InvalidOperationException("Action has already been set.");
             }
 
-            _action = action;
+            // This is not a threadsafe check because _isRunningFlag could be set after the Interlocked.Read
+            // however it is still useful to prevent a single thread calling Start and SetAction in the wrong order
+            // which is the more likely programming error in this app.
+            if (Interlocked.Read(ref _isRunningFlag) == 1)
+            {
+                throw new InvalidOperationException("Action can not be set if the timer is already running.");
+            }
+
+            _action = action ?? throw new ArgumentNullException(nameof(action));
         }
 
-        /// <exception cref="InvalidOperationException">The action must be set before the timer fires.</exception>
-        private void TimerElapsed(object sender, ElapsedEventArgs e)
+        private bool TimerElapsed()
         {
-            // This method will be called on a ThreadPool thread.
-
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
-
-            if (_action == null)
+            // Clear _isRunningFlag.
+            // This must be done before calling _action because _action will re-start the timer if required.
+            if (Interlocked.CompareExchange(ref _isRunningFlag, 0, 1) == 0)
             {
-                throw new InvalidOperationException("The action must be set before the timer fires.");
+                throw new InvalidOperationException("The timer should not fire if it is not running.");
             }
 
             _action.Invoke();
+
+            return false; // don't automatically run again.
         }
 
         /// <exception cref="InvalidOperationException">The action must be set before the timer is started.</exception>
@@ -65,21 +66,13 @@ namespace Rmjcs.Simonish.Helpers
                 throw new InvalidOperationException("The action must be set before the timer is started.");
             }
 
-            _timer.Start();
+            // Set _isRunningFlag, unless it is already set.
+            if (Interlocked.CompareExchange(ref _isRunningFlag, 1, 0) == 1)
+            {
+                throw new InvalidOperationException("Timer can not be started if the timer is already running.");
+            }
+
+            Device.StartTimer(_oneSecond, TimerElapsed);
         }
-
-        #region IDisposable
-
-        /// <summary>
-        /// Releases all resources used by the current <see cref="OneSecondTimer"/>.
-        /// </summary>
-        public void Dispose()
-        {
-            Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
-
-            _timer?.Dispose();
-        }
-
-        #endregion
     }
 }

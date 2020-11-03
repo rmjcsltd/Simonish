@@ -204,7 +204,6 @@ namespace Rmjcs.Simonish.Services
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            _timer?.Dispose();
             _game?.Dispose();
         }
 

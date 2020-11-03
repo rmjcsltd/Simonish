@@ -5,7 +5,7 @@ namespace Rmjcs.Simonish.Helpers
     /// <summary>
     /// An interface for a class to provide timer functionality.
     /// </summary>
-    interface ITimer : IDisposable
+    interface ITimer
     {
         /// <summary>
         /// Set the Action to execute when the timer fires.

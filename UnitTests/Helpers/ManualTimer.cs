@@ -52,14 +52,5 @@ namespace UnitTests.Helpers
             // Unlike a real System.Timers.Timer the action is invoked synchronously on the current thread.
             _action.Invoke();
         }
-
-        #region IDispose
-
-        public void Dispose()
-        {
-            // Nothing to dispose but ITimer requires this.
-        }
-
-        #endregion
     }
 }
