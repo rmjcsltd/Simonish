@@ -5,7 +5,7 @@
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
     <AssemblyName>Rmjcs.Simonish</AssemblyName>
     <RootNamespace>Rmjcs.Simonish</RootNamespace>
-    <Version>1.1.1</Version>
+    <Version>1.2.0</Version>
     <Product>Simonish</Product>
     <Company>RMJCS</Company>
     <Authors>RMJCS</Authors>
