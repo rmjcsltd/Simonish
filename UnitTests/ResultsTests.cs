@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Rmjcs.Simonish.Models;
 
@@ -21,7 +22,18 @@ namespace UnitTests
         [Test]
         public void Constructor_Params_Test()
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new Results((string)null));
+            Results results = new Results((string) null);
+            Assert.AreEqual(0,results.BestResults.Count());
+            Assert.AreEqual(0,results.LatestResults.Count());
+
+            results = new Results(string.Empty);
+            Assert.AreEqual(0,results.BestResults.Count());
+            Assert.AreEqual(0,results.LatestResults.Count());
+
+            results = new Results(" ");
+            Assert.AreEqual(0,results.BestResults.Count());
+            Assert.AreEqual(0,results.LatestResults.Count());
+
             Assert.Throws<ArgumentNullException>(() => _ = new Results((Results)null));
 
             Result result = new Result(default, 2, 1);

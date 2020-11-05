@@ -50,45 +50,42 @@ namespace Rmjcs.Simonish.Models
         /// Initialises a new instance of the <see cref="Results"/> class from the supplied string representation of a <see cref="Results"/>.
         /// </summary>
         /// <param name="gameResultsText">A string representation of a <see cref="Results"/>.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="gameResultsText"/> is <see langword="null"/></exception>
         /// <exception cref="FormatException">The string representation of a <see cref="Results"/> is not valid.</exception>
         public Results(string gameResultsText)
         {
             Utility.WriteDebugEntryMessage(System.Reflection.MethodBase.GetCurrentMethod(), this);
 
-            if (gameResultsText == null)
-            {
-                throw new ArgumentNullException(nameof(gameResultsText));
-            }
-
-            string[] lines = gameResultsText.Split(new[] { '\r' }, StringSplitOptions.RemoveEmptyEntries);
-
             List<Result> bestResults = new List<Result>();
             List<Result> latestResults = new List<Result>();
 
-            for (int i = 0; i < lines.Length; i++)
+            if (!string.IsNullOrWhiteSpace(gameResultsText))
             {
-                string line = lines[i];
+                string[] lines = gameResultsText.Split(new[] {'\r'}, StringSplitOptions.RemoveEmptyEntries);
 
-                // We need at least 2 characters to have a line type and some line data.
-                if (line.Length < 3)
+                for (int i = 0; i < lines.Length; i++)
                 {
-                    throw new FormatException($"Line {i} is too short.");
-                }
+                    string line = lines[i];
 
-                char lineType = line[0];
+                    // We need at least 2 characters to have a line type and some line data.
+                    if (line.Length < 3)
+                    {
+                        throw new FormatException($"Line {i} is too short.");
+                    }
 
-                if (lineType == 'B')
-                {
-                    bestResults.Add(new Result(line.Substring(1)));
-                }
-                else if (lineType == 'L')
-                {
-                    latestResults.Add(new Result(line.Substring(1)));
-                }
-                else
-                {
-                    throw new FormatException($"Line {i} does not start with B or L.");
+                    char lineType = line[0];
+
+                    if (lineType == 'B')
+                    {
+                        bestResults.Add(new Result(line.Substring(1)));
+                    }
+                    else if (lineType == 'L')
+                    {
+                        latestResults.Add(new Result(line.Substring(1)));
+                    }
+                    else
+                    {
+                        throw new FormatException($"Line {i} does not start with B or L.");
+                    }
                 }
             }
 
